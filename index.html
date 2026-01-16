@@ -14,7 +14,6 @@
       --shadow:0 10px 28px rgba(11,27,51,.10);
       --radius:18px;
 
-      /* default partner theme (overridden via body[data-partner]) */
       --pf-main:#1d4ed8;
       --pf-soft:rgba(29,78,216,.14);
       --pf-soft2:rgba(29,78,216,.08);
@@ -24,7 +23,6 @@
       --red:rgba(244,63,94,.18);
     }
 
-    /* Partner-Farben */
     body[data-partner="fonds_finanz"]{ --pf-main:#2563eb; --pf-soft:rgba(37,99,235,.14); --pf-soft2:rgba(37,99,235,.08); }
     body[data-partner="demv"]{        --pf-main:#059669; --pf-soft:rgba(5,150,105,.14);  --pf-soft2:rgba(5,150,105,.08); }
     body[data-partner="taures"]{      --pf-main:#7c3aed; --pf-soft:rgba(124,58,237,.14); --pf-soft2:rgba(124,58,237,.08); }
@@ -34,7 +32,7 @@
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
       color:var(--text);
       background:
         radial-gradient(1200px 800px at 15% 12%, var(--pf-soft), transparent 55%),
@@ -67,11 +65,10 @@
     .pill.ok{border-color:rgba(16,185,129,.30); background:rgba(16,185,129,.10); color:#065f46}
     .pill.warn{border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.12); color:#92400e}
     .pill.bad{border-color:rgba(244,63,94,.35); background:rgba(244,63,94,.12); color:#9f1239}
-
     .spacer{flex:1}
 
     .actions{display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end}
-    button, .btn{
+    button{
       appearance:none; border:1px solid var(--line);
       background:rgba(255,255,255,.9);
       padding:9px 12px; border-radius:12px;
@@ -83,8 +80,7 @@
     button.danger{background:rgba(244,63,94,.10); border-color:rgba(244,63,94,.35); color:#9f1239}
     button.ghost{background:transparent}
     button.tab{
-      padding:8px 12px; border-radius:999px;
-      background:transparent;
+      padding:8px 12px; border-radius:999px; background:transparent;
     }
     button.tab.active{
       background:var(--pf-soft);
@@ -112,24 +108,12 @@
     .muted{color:var(--muted); font-size:13px}
     .divider{height:1px; background:var(--line); margin:14px 0}
 
-    .tabsRow{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
     .partnerTabs{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
-    .partnerTabs button{
-      padding:8px 12px; border-radius:999px;
-      background:rgba(255,255,255,.85);
-    }
-    .partnerTabs button.active{
-      background:var(--pf-soft);
-      border-color:transparent;
-      color:var(--pf-main);
-    }
+    .partnerTabs button{padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.85)}
+    .partnerTabs button.active{background:var(--pf-soft); border-color:transparent; color:var(--pf-main)}
 
     .row{display:flex; gap:10px; flex-wrap:wrap}
-    .field{
-      display:flex; flex-direction:column; gap:6px;
-      flex:1;
-      min-width:160px;
-    }
+    .field{display:flex; flex-direction:column; gap:6px; flex:1; min-width:160px}
     .field.w2{flex:0 0 calc(16.666% - 10px); min-width:160px}
     .field.w3{flex:0 0 calc(25% - 10px); min-width:180px}
     .field.w4{flex:0 0 calc(33.333% - 10px); min-width:180px}
@@ -152,7 +136,6 @@
     }
     textarea{min-height:90px; resize:vertical}
 
-    /* Stammdaten Highlight */
     .stammBox{
       border:1px solid color-mix(in srgb, var(--pf-main) 28%, transparent);
       background: linear-gradient(180deg, var(--pf-soft2), rgba(255,255,255,.92));
@@ -191,20 +174,10 @@
     th, td{font-size:12px; padding:10px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
     th{color:var(--muted); font-weight:800; background:rgba(255,255,255,.65); position:sticky; top:0}
     .tblWrap{max-height:360px; overflow:auto; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.7)}
-    .kpiGrid{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:12px}
-    .kpi{
-      border:1px solid var(--line); border-radius:14px; padding:12px;
-      background:rgba(255,255,255,.75);
-    }
-    .kpi b{display:block; font-size:12px; color:var(--muted)}
-    .kpi span{display:block; font-size:18px; font-weight:900; margin-top:4px}
 
     .hidden{display:none !important}
 
-    @media (max-width: 1020px){
-      .wrap{grid-template-columns:1fr}
-    }
-
+    @media (max-width: 1020px){ .wrap{grid-template-columns:1fr} }
     @media print{
       header, .no-print{display:none !important}
       body{background:#fff}
@@ -223,7 +196,7 @@
     </div>
     <span class="pill" id="statusPill">bereit</span>
 
-    <div class="tabsRow" style="margin-left:8px;">
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-left:8px;">
       <button class="tab active" id="tabMain">Hauptansicht</button>
       <button class="tab" id="tabStats">Auswertung</button>
     </div>
@@ -235,18 +208,22 @@
       <button id="btnPrint">Drucken</button>
       <button id="btnNewField">Neue Felder erstellen</button>
       <button class="danger" id="btnDeleteField">Feld löschen</button>
+
       <button id="btnExportDelta">Export (Delta heute)</button>
       <button id="btnExportFull">Export (Voll)</button>
+      <button class="primary" id="btnExportSafeFull">SAFE Export (Voll)</button>
       <button id="btnExportCSV">CSV Export</button>
-      <button id="btnImport">Import / Merge</button>
+
+      <button id="btnImportMerge">Import / Merge</button>
+      <button class="danger" id="btnImportReplace">Import (Replace)</button>
       <input id="fileImport" type="file" accept="application/json" multiple class="hidden">
+
       <button class="danger" id="btnLogout">Logout</button>
     </div>
   </div>
 </header>
 
 <div class="wrap">
-  <!-- LOGIN / NAV -->
   <aside class="card" id="loginCard">
     <div class="h">Login (offline)</div>
     <div class="muted" style="margin-top:6px;">
@@ -274,8 +251,8 @@
     <div class="divider"></div>
 
     <div class="mini">
-      <div><b>Hinweis:</b> Offline-„Zugriffsschutz“ ist nur so sicher wie das Gerät selbst.</div>
-      <div>Empfehlung: Geräte passwortgeschützt halten.</div>
+      <div><b>Wichtig:</b> „Lokale Daten löschen“ entfernt die komplette DB dieses Browsers.</div>
+      <div>Restore danach: <b>Import (Replace)</b> mit einer Voll-Datei.</div>
     </div>
   </aside>
 
@@ -307,26 +284,24 @@
     <div class="divider"></div>
 
     <div class="mini">
-      <div><b>Sync-Workflow täglich:</b></div>
+      <div><b>Team-Workflow:</b></div>
       <ol style="margin:8px 0 0 18px;padding:0;">
-        <li>Mitarbeiter: „Export (Delta heute)“</li>
-        <li>Du: „Import / Merge“ (beide Dateien)</li>
-        <li>Optional: Du sendest „Export (Voll)“ zurück</li>
+        <li>Mitarbeiter: Export (Delta heute)</li>
+        <li>Master: Import/Merge (alle Deltas)</li>
+        <li>Master: SAFE Export (Voll) zurück an Team</li>
       </ol>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="card hidden" id="mainCard">
     <div style="display:flex; align-items:flex-start; gap:12px; justify-content:space-between;">
       <div>
         <div class="h">Datensatz</div>
         <div class="muted">Autosave: Änderungen werden sofort lokal gespeichert.</div>
       </div>
-      <div class="pill" id="autosavePill">ok</div>
+      <div class="pill ok" id="autosavePill">ok</div>
     </div>
 
-    <!-- Top row: Rolle + Partnernummer + MAK + Datum -->
     <div class="row" style="margin-top:12px;">
       <div class="field w5">
         <label>Rolle (frei)</label>
@@ -349,7 +324,6 @@
       </div>
     </div>
 
-    <!-- Stammdaten -->
     <div class="stammBox" style="margin-top:14px;">
       <div class="stammTitle">
         <div class="tag">Stammdaten</div>
@@ -383,7 +357,7 @@
           <label>Favorit</label>
           <div style="display:flex; align-items:center; gap:10px;">
             <input id="favorit" type="checkbox" style="width:auto; transform:scale(1.2);">
-            <span class="muted">als Favorit markieren (★ im Reiter)</span>
+            <span class="muted">★ im Reiter</span>
           </div>
         </div>
         <div class="field w4">
@@ -397,7 +371,7 @@
           <label>Online Abschluss</label>
           <div style="display:flex; align-items:center; gap:10px;">
             <input id="online" type="checkbox" style="width:auto; transform:scale(1.2);">
-            <span class="muted">wird / wurde online abgeschlossen</span>
+            <span class="muted">online Abschluss</span>
           </div>
         </div>
       </div>
@@ -412,12 +386,10 @@
 
     <div class="divider"></div>
 
-    <!-- Kontakte / Wiedervorlagen -->
-    <div class="h">Kontakt-Historie (Kontakt 1, 2, … inkl. Wiedervorlage)</div>
+    <div class="h">Kontakt-Historie (inkl. Wiedervorlage)</div>
     <div class="muted" style="margin-top:6px;">
-      Jeder Kontakt enthält optional eine Wiedervorlage (Follow-up Datum + Thema) und „erledigt“.
+      Jeder Kontakt enthält optional eine Wiedervorlage (Datum + Thema) und „erledigt“.
     </div>
-
     <div id="contactsWrap" style="margin-top:12px;"></div>
 
     <div class="row" style="margin-top:10px;">
@@ -426,130 +398,37 @@
 
     <div class="divider"></div>
 
-    <!-- Freies Feld -->
     <div class="h">Freies Feld</div>
     <textarea id="freiesFeld" placeholder="Notizen …" style="margin-top:10px;"></textarea>
 
     <div class="divider"></div>
 
-    <!-- Custom Fields -->
     <div class="h">Zusatzfelder (Custom)</div>
-    <div class="muted" style="margin-top:6px;">Partnerbezogene Zusatzfelder (werden oben über „Neue Felder erstellen“ angelegt).</div>
+    <div class="muted" style="margin-top:6px;">Partnerbezogene Zusatzfelder (über „Neue Felder erstellen“).</div>
     <div id="customFieldsWrap" style="margin-top:12px;"></div>
   </main>
 
-  <!-- STATS -->
   <main class="card hidden" id="statsCard">
     <div class="h">Auswertung</div>
     <div class="muted" style="margin-top:6px;">
-      1) Globale Wiedervorlagen-Übersicht (über alle 5 Partner) · 2) Jahreswerte Ziel/Ist pro Datensatz · 3) Monatstabelle (Jahreswerte optional auf Monate verteilt).
+      Globale Wiedervorlagen-Übersicht über alle Partner.
     </div>
 
     <div class="divider"></div>
 
     <div class="h">Offene Wiedervorlagen (global)</div>
-    <div class="muted" style="margin-top:6px;">Alle offenen Follow-ups aus der Kontakt-Historie über Fonds Finanz, DEMV, Taures, TVD, WIR-Finanz.</div>
     <div class="tblWrap" style="margin-top:12px;">
       <table>
         <thead>
         <tr>
-          <th>Fällig</th>
-          <th>Partner</th>
-          <th>Reiter</th>
-          <th>Kontakt</th>
-          <th>Anlass</th>
-          <th>Thema (Wiedervorlage)</th>
-          <th>Notiz</th>
+          <th>Fällig</th><th>Partner</th><th>Reiter</th><th>Kontakt</th><th>Anlass</th><th>Thema</th><th>Notiz</th>
         </tr>
         </thead>
         <tbody id="followupsTbody"></tbody>
       </table>
     </div>
-
-    <div class="divider"></div>
-
-    <div class="row" style="align-items:flex-end;">
-      <div class="field w3">
-        <label>Jahr</label>
-        <select id="yearSelect"></select>
-      </div>
-      <div class="field w3">
-        <label>Partner (für Monatstabelle)</label>
-        <select id="statsPartner"></select>
-      </div>
-      <div class="field w3">
-        <button id="btnStatsCSV">CSV Export (Auswertung)</button>
-      </div>
-      <div class="field w3">
-        <button id="btnStatsPrint">Drucken</button>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="h">Jahresübersicht Ziel / Ist (€) – manuell (pro Reiter)</div>
-    <div class="muted" style="margin-top:6px;">
-      Diese Werte sind Jahreswerte und werden im Datensatz eingetragen. In der Monatstabelle werden sie optional gleichmäßig auf 12 Monate verteilt.
-    </div>
-
-    <div class="tblWrap" style="margin-top:12px;">
-      <table>
-        <thead>
-        <tr>
-          <th>Partner</th>
-          <th>Reiter</th>
-          <th>Gesamt Ziel</th>
-          <th>Gesamt Ist</th>
-          <th>Voll Ziel</th>
-          <th>Voll Ist</th>
-          <th>Beihilfe Ziel</th>
-          <th>Beihilfe Ist</th>
-          <th>Zusatz Ziel</th>
-          <th>Zusatz Ist</th>
-          <th>Pflege Ziel</th>
-          <th>Pflege Ist</th>
-          <th>bKV Ziel</th>
-          <th>bKV Ist</th>
-          <th>Reise Ziel</th>
-          <th>Reise Ist</th>
-        </tr>
-        </thead>
-        <tbody id="yearTableTbody"></tbody>
-      </table>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="h">Monatstabelle (Jahreswerte → Monat)</div>
-    <div class="muted" style="margin-top:6px;">Summen über alle Reiter des ausgewählten Partners. Jahreswerte werden /12 auf Monate verteilt.</div>
-
-    <div class="tblWrap" style="margin-top:12px; max-height:420px;">
-      <table>
-        <thead>
-        <tr>
-          <th>Monat</th>
-          <th>Voll Ist</th>
-          <th>Voll Ziel</th>
-          <th>Beihilfe Ist</th>
-          <th>Beihilfe Ziel</th>
-          <th>Zusatz Ist</th>
-          <th>Zusatz Ziel</th>
-          <th>Pflege Ist</th>
-          <th>Pflege Ziel</th>
-          <th>bKV Ist</th>
-          <th>bKV Ziel</th>
-          <th>Reise Ist</th>
-          <th>Reise Ziel</th>
-          <th>Gesamt Ist</th>
-          <th>Gesamt Ziel</th>
-        </tr>
-        </thead>
-        <tbody id="monthTableTbody"></tbody>
-      </table>
-    </div>
   </main>
 
-  <!-- RESULTS OVERLAY -->
   <section class="card hidden" id="resultsCard" style="grid-column: 1 / -1;">
     <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
       <div>
@@ -562,16 +441,7 @@
       <table>
         <thead>
         <tr>
-          <th>Partner</th>
-          <th>Reiter</th>
-          <th>Rolle</th>
-          <th>MAK</th>
-          <th>Partnernr</th>
-          <th>Name</th>
-          <th>Firma</th>
-          <th>E-Mail</th>
-          <th>Tel/Mobil</th>
-          <th>Ort</th>
+          <th>Partner</th><th>Reiter</th><th>Rolle</th><th>MAK</th><th>Partnernr</th><th>Name</th><th>Firma</th><th>E-Mail</th><th>Tel/Mobil</th><th>Ort</th>
         </tr>
         </thead>
         <tbody id="resultsTbody"></tbody>
@@ -583,6 +453,10 @@
 <script>
 (() => {
   // ========= Config =========
+  const APP_NAME = "Vertriebspartner Offline";
+  const APP_FORMAT = "VP_SAFE_EXPORT_V1";
+  const APP_BUILD = "2026-01-16-importfix";
+
   const PARTNERS = [
     { key:"fonds_finanz", name:"Fonds Finanz", hasMak:true },
     { key:"demv",        name:"DEMV",        hasMak:true },
@@ -591,11 +465,10 @@
     { key:"wir_finanz",  name:"WIR-Finanz",  hasMak:false },
   ];
 
-  const STORAGE_KEY = "vp_offline_db_v2";
-  const SESSION_KEY = "vp_offline_session_v2";
-  const USERS_KEY   = "vp_offline_users_v2";
-
-  const MONTHS = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+  // IMPORTANT: Stable storage keys (do not change later)
+  const STORAGE_KEY = "vp_offline_db_v3";
+  const SESSION_KEY = "vp_offline_session_v3";
+  const USERS_KEY   = "vp_offline_users_v3";
 
   const $ = (id) => document.getElementById(id);
 
@@ -617,7 +490,6 @@
     const u = safeJSONParse(raw);
     if (u && Array.isArray(u.list)) return u;
 
-    // default
     const seed = {
       list: [
         { user:"master", pass:"master", role:"master" },
@@ -673,9 +545,6 @@
       const users = loadUsers();
       const found = users.list.find(x => x.user === user);
 
-      // Free-field behaviour:
-      // - If user exists: verify password
-      // - If not exists: create new staff user with given password
       if (found){
         if (found.pass !== pass){
           $("loginHint").textContent = "Login fehlgeschlagen";
@@ -699,7 +568,6 @@
       if (!confirm("Wirklich alle lokalen Daten (DB + Session) in diesem Browser löschen?")) return;
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(SESSION_KEY);
-      // Users lassen wir absichtlich drin (sonst sperrst du dich ggf. aus)
       renderAll();
     };
   }
@@ -714,13 +582,14 @@
         records: [],
         activeRecordId: null
       };
-      // ensure at least one record
       const r = baseRecord(p);
       partners[p.key].records.push(r);
       partners[p.key].activeRecordId = r.id;
     });
     return {
-      version: 2,
+      app: APP_NAME,
+      format: "VP_DB",
+      version: 3,
       createdAt: nowISO(),
       updatedAt: nowISO(),
       partners
@@ -740,11 +609,10 @@
       partnerNummer: "",
       makNummer: partner.hasMak ? "" : undefined,
 
-      // Stammdaten
       favorit: false,
       vorname: "",
       nachname: "",
-      name: "",          // legacy/Anzeige (wird aus vorname+nachname gesetzt)
+      name: "",
       firma: "",
       email: "",
       mobil: "",
@@ -757,43 +625,39 @@
       optin: false,
       onlineAbschluss: false,
 
-      // Jahresübersicht (manuell) Ziel/Ist
-      gesamtZiel: "", gesamtIst: "",
-      vollZiel: "", vollIst: "",
-      beihilfeZiel: "", beihilfeIst: "",
-      zusatzZiel: "", zusatzIst: "",
-      pflegeZiel: "", pflegeIst: "",
-      bkvZiel: "", bkvIst: "",
-      reiseZiel: "", reiseIst: "",
+      // yearly manual (kept for future pages)
+      gesamtZiel:"", gesamtIst:"", vollZiel:"", vollIst:"",
+      beihilfeZiel:"", beihilfeIst:"", zusatzZiel:"", zusatzIst:"",
+      pflegeZiel:"", pflegeIst:"", bkvZiel:"", bkvIst:"",
+      reiseZiel:"", reiseIst:"",
 
-      // Kontakte (inkl. Wiedervorlage)
       kontakte: [
-        { id: uid(), datum: todayISO(), anlass: "", notiz: "", followUpDatum: "", followUpThema: "", followUpErledigt: false, createdAt: nowISO(), updatedAt: nowISO() }
+        { id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() }
       ],
 
       freiesFeld: "",
-
-      custom: {} // custom field values
+      custom: {}
     };
   }
 
-  function loadDB(){
-    const raw = localStorage.getItem(STORAGE_KEY);
-    let db = raw ? safeJSONParse(raw) : null;
+  // ---- schema ensure WITHOUT reloading localStorage (IMPORT FIX)
+  function ensureSchema(db){
     if (!db || !db.partners) db = emptyDB();
 
-    // Schema ensure
     PARTNERS.forEach(p => {
       if (!db.partners[p.key]) db.partners[p.key] = { key:p.key, customFields:[], records:[], activeRecordId:null };
       const ps = db.partners[p.key];
+
       ps.customFields ||= [];
       ps.records ||= [];
+
       if (ps.records.length === 0){
         const r = baseRecord(p);
         ps.records.push(r);
         ps.activeRecordId = r.id;
       }
-      ps.activeRecordId ||= ps.records[0].id;
+
+      ps.activeRecordId ||= (ps.records[0] && ps.records[0].id);
 
       ps.records.forEach(r => {
         r.custom ||= {};
@@ -813,7 +677,6 @@
 
         r.firma ||= "";
         r.email ||= "";
-
         r.mobil ||= "";
         r.telefon ||= "";
         r.strasse ||= "";
@@ -824,16 +687,14 @@
         r.optin ??= false;
         r.onlineAbschluss ??= false;
 
-        // yearly fields
         r.gesamtZiel ??= ""; r.gesamtIst ??= "";
-        r.vollZiel ??= "";   r.vollIst ??= "";
+        r.vollZiel ??= ""; r.vollIst ??= "";
         r.beihilfeZiel ??= ""; r.beihilfeIst ??= "";
         r.zusatzZiel ??= ""; r.zusatzIst ??= "";
         r.pflegeZiel ??= ""; r.pflegeIst ??= "";
-        r.bkvZiel ??= "";    r.bkvIst ??= "";
-        r.reiseZiel ??= "";  r.reiseIst ??= "";
+        r.bkvZiel ??= ""; r.bkvIst ??= "";
+        r.reiseZiel ??= ""; r.reiseIst ??= "";
 
-        // Kontakte ensure
         if (!Array.isArray(r.kontakte)) r.kontakte = [];
         if (r.kontakte.length === 0){
           r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
@@ -850,14 +711,21 @@
           k.updatedAt ||= nowISO();
         });
 
-        // sync r.name from v/n if present
         const full = `${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim();
         if (full) r.name = full;
       });
     });
 
-    saveDB(db);
+    db.updatedAt = nowISO();
     return db;
+  }
+
+  function loadDB(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const parsed = raw ? safeJSONParse(raw) : null;
+    DB = ensureSchema(parsed);
+    saveDB(DB);
+    return DB;
   }
 
   function saveDB(db){
@@ -865,19 +733,12 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
   }
 
-  // global db state
   let DB = loadDB();
   let ACTIVE_PARTNER_KEY = PARTNERS[0].key;
 
-  function getActivePartner(){
-    return PARTNERS.find(p => p.key === ACTIVE_PARTNER_KEY) || PARTNERS[0];
-  }
-  function getPartnerState(key){
-    return DB.partners[key];
-  }
-  function getActivePartnerState(){
-    return getPartnerState(ACTIVE_PARTNER_KEY);
-  }
+  function getActivePartner(){ return PARTNERS.find(p => p.key === ACTIVE_PARTNER_KEY) || PARTNERS[0]; }
+  function getPartnerState(key){ return DB.partners[key]; }
+  function getActivePartnerState(){ return getPartnerState(ACTIVE_PARTNER_KEY); }
   function getActiveRecord(){
     const ps = getActivePartnerState();
     return ps.records.find(r => r.id === ps.activeRecordId) || ps.records[0];
@@ -891,33 +752,7 @@
     $("autosavePill").className = "pill ok";
   }
 
-  // ========= Address autofill (Firma -> Adresse) =========
-  const ADDRESS_BOOK = [
-    {
-      match: /fonds\s*finanz.*maklerservice.*gmbh/i,
-      strasse: "Riesstraße 25",
-      plz: "80992",
-      ort: "München",
-      land: "DE"
-    }
-  ];
-
-  function applyAddressAutofillFromFirma(){
-    const firma = ($("firma").value || "").trim();
-    if (!firma) return false;
-    for (const a of ADDRESS_BOOK){
-      if (a.match.test(firma)){
-        if (!$("strasse").value) $("strasse").value = a.strasse;
-        if (!$("plz").value) $("plz").value = a.plz;
-        if (!$("ort").value) $("ort").value = a.ort;
-        if (!$("land").value) $("land").value = a.land;
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // ========= UI: Partner tabs / record select labels =========
+  // ========= UI =========
   function recordLabel(p, r, idx){
     const role = ((r.rolle || "").trim()) || "ohne Rolle";
     const fn = ((r.vorname||"").trim() + " " + (r.nachname||"").trim()).trim();
@@ -957,7 +792,6 @@
     });
   }
 
-  // ========= Render main form =========
   function setFieldValue(id, value){
     const el = $(id);
     if (!el) return;
@@ -968,16 +802,13 @@
     const p = getActivePartner();
     const r = getActiveRecord();
 
-    // show/hide mak
     $("makWrap").style.display = p.hasMak ? "" : "none";
 
-    // Top fields
     setFieldValue("rolle", r.rolle);
     setFieldValue("partnerNummer", r.partnerNummer);
     setFieldValue("datum", r.datum || todayISO());
     if (p.hasMak) setFieldValue("mak", r.makNummer ?? "");
 
-    // Stammdaten
     setFieldValue("vorname", r.vorname);
     setFieldValue("nachname", r.nachname);
     setFieldValue("firma", r.firma);
@@ -993,13 +824,9 @@
     $("optin").checked = !!r.optin;
     $("online").checked = !!r.onlineAbschluss;
 
-    // Freies Feld
     $("freiesFeld").value = r.freiesFeld || "";
 
-    // Kontakte
     renderContacts();
-
-    // Custom
     renderCustomFields();
   }
 
@@ -1053,21 +880,17 @@
       const row3 = document.createElement("div");
       row3.className = "row";
       row3.style.marginTop = "10px";
-      row3.innerHTML = `
-        <button class="danger" data-del-k="${k.id}">Kontakt löschen</button>
-      `;
+      row3.innerHTML = `<button class="danger" data-del-k="${k.id}">Kontakt löschen</button>`;
       box.appendChild(row3);
 
       wrap.appendChild(box);
 
-      // fill values after append
       box.querySelectorAll("input[data-k]").forEach(inp => {
         const fid = inp.getAttribute("data-f");
         if (inp.type === "checkbox") inp.checked = !!k[fid];
         else inp.value = k[fid] || "";
       });
 
-      // bind
       box.querySelectorAll("input[data-k]").forEach(inp => {
         inp.oninput = () => {
           const rid = inp.getAttribute("data-k");
@@ -1078,12 +901,11 @@
           else kk[fid] = inp.value;
           kk.updatedAt = nowISO();
           touch(r);
-          renderFollowupsGlobal(); // keep overview fresh
+          renderFollowupsGlobal();
         };
         inp.onchange = inp.oninput;
       });
 
-      // delete contact
       box.querySelectorAll("button[data-del-k]").forEach(btn => {
         btn.onclick = () => {
           if (!confirm("Kontakt wirklich löschen?")) return;
@@ -1117,8 +939,6 @@
       const f = document.createElement("div");
       f.className = "field w6";
       f.innerHTML = `<label>${escapeHTML(cf.label)}</label>`;
-      let el;
-
       const id = "cf_"+cf.id;
 
       if (cf.type === "checkbox"){
@@ -1133,17 +953,17 @@
         container.innerHTML = `<input type="checkbox" id="${id}" style="width:auto; transform:scale(1.2);">
                                <span class="muted">Ja / Nein</span>`;
         f.appendChild(container);
-        el = container.querySelector("input");
+        const el = container.querySelector("input");
         el.checked = !!r.custom[cf.id];
         el.onchange = () => { r.custom[cf.id] = !!el.checked; touch(r); };
       } else if (cf.type === "textarea"){
-        el = document.createElement("textarea");
+        const el = document.createElement("textarea");
         el.id = id;
         el.value = r.custom[cf.id] || "";
         el.oninput = () => { r.custom[cf.id] = el.value; touch(r); };
         f.appendChild(el);
       } else {
-        el = document.createElement("input");
+        const el = document.createElement("input");
         el.id = id;
         el.value = r.custom[cf.id] || "";
         el.oninput = () => { r.custom[cf.id] = el.value; touch(r); };
@@ -1165,19 +985,10 @@
 
   function buildSearchText(p, r){
     const parts = [];
-    parts.push(p.name);
-    parts.push(r.rolle, r.partnerNummer, r.makNummer, r.datum);
+    parts.push(p.name, r.rolle, r.partnerNummer, r.makNummer, r.datum);
     parts.push(r.vorname, r.nachname, r.name, r.firma, r.email, r.mobil, r.telefon, r.strasse, r.plz, r.ort, r.land);
     parts.push(r.freiesFeld);
-    // contacts
-    if (Array.isArray(r.kontakte)){
-      r.kontakte.forEach(k => {
-        parts.push(k.datum, k.anlass, k.notiz, k.followUpDatum, k.followUpThema, k.followUpErledigt ? "erledigt":"offen");
-      });
-    }
-    // custom
-    const ps = getPartnerState(p.key);
-    ps.customFields.forEach(cf => parts.push(r.custom?.[cf.id]));
+    (r.kontakte || []).forEach(k => parts.push(k.datum, k.anlass, k.notiz, k.followUpDatum, k.followUpThema, k.followUpErledigt ? "erledigt" : "offen"));
     return normalize(parts.filter(Boolean).join(" | "));
   }
 
@@ -1191,9 +1002,7 @@
       const ps = getPartnerState(p.key);
       ps.records.forEach((r, idx) => {
         const txt = buildSearchText(p, r);
-        if (!q || txt.includes(q)){
-          hits.push({ p, r, idx });
-        }
+        if (!q || txt.includes(q)) hits.push({ p, r, idx });
       });
     });
 
@@ -1295,217 +1104,38 @@
     });
   }
 
-  // ========= Year / Month stats =========
-  function moneyParse(v){
-    if (v === null || v === undefined) return 0;
-    const s = String(v).replace(/\./g,"").replace(",",".").replace(/[^\d.-]/g,"").trim();
-    const n = parseFloat(s);
-    return Number.isFinite(n) ? n : 0;
-  }
-  function moneyFmt(n){
-    const x = Math.round((n||0) * 100) / 100;
-    return x.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  }
-
-  function yearsAvailable(){
-    const years = new Set();
-    PARTNERS.forEach(p=>{
-      getPartnerState(p.key).records.forEach(r=>{
-        const y = (r.datum||"").slice(0,4);
-        if (y && /^\d{4}$/.test(y)) years.add(parseInt(y,10));
-      });
-    });
-    const yNow = new Date().getFullYear();
-    years.add(yNow);
-    return Array.from(years).sort((a,b)=>b-a);
-  }
-
-  function renderYearSelect(){
-    const ys = yearsAvailable();
-    const sel = $("yearSelect");
-    sel.innerHTML = "";
-    ys.forEach(y=>{
-      const opt = document.createElement("option");
-      opt.value = String(y);
-      opt.textContent = String(y);
-      sel.appendChild(opt);
-    });
-    sel.value = String(new Date().getFullYear());
-  }
-
-  function renderStatsPartnerSelect(){
-    const sel = $("statsPartner");
-    sel.innerHTML = "";
-    PARTNERS.forEach(p=>{
-      const opt = document.createElement("option");
-      opt.value = p.key;
-      opt.textContent = p.name;
-      sel.appendChild(opt);
-    });
-    sel.value = ACTIVE_PARTNER_KEY;
-  }
-
-  function renderYearTable(){
-    const y = parseInt($("yearSelect").value,10) || new Date().getFullYear();
-    const tb = $("yearTableTbody");
-    tb.innerHTML = "";
-
-    const rows = [];
-    PARTNERS.forEach(p=>{
-      const ps = getPartnerState(p.key);
-      ps.records.forEach((r, idx)=>{
-        const ry = parseInt((r.datum||"").slice(0,4),10);
-        if (ry !== y) return;
-        rows.push({p,r,idx});
-      });
-    });
-
-    if (!rows.length){
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="16" class="muted">Keine Datensätze im Jahr ${y}.</td>`;
-      tb.appendChild(tr);
-      return;
+  // ========= Helpers =========
+  async function copyToClipboard(text){
+    try{ await navigator.clipboard.writeText(text || ""); }
+    catch(e){
+      const ta = document.createElement("textarea");
+      ta.value = text || "";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
     }
-
-    rows.forEach(x=>{
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${escapeHTML(x.p.name)}</td>
-        <td>${escapeHTML(recordLabel(x.p, x.r, x.idx))}</td>
-        <td>${escapeHTML(x.r.gesamtZiel||"")}</td>
-        <td>${escapeHTML(x.r.gesamtIst||"")}</td>
-        <td>${escapeHTML(x.r.vollZiel||"")}</td>
-        <td>${escapeHTML(x.r.vollIst||"")}</td>
-        <td>${escapeHTML(x.r.beihilfeZiel||"")}</td>
-        <td>${escapeHTML(x.r.beihilfeIst||"")}</td>
-        <td>${escapeHTML(x.r.zusatzZiel||"")}</td>
-        <td>${escapeHTML(x.r.zusatzIst||"")}</td>
-        <td>${escapeHTML(x.r.pflegeZiel||"")}</td>
-        <td>${escapeHTML(x.r.pflegeIst||"")}</td>
-        <td>${escapeHTML(x.r.bkvZiel||"")}</td>
-        <td>${escapeHTML(x.r.bkvIst||"")}</td>
-        <td>${escapeHTML(x.r.reiseZiel||"")}</td>
-        <td>${escapeHTML(x.r.reiseIst||"")}</td>
-      `;
-      tb.appendChild(tr);
-    });
   }
 
-  function monthlyBucketsForPartner(partnerKey, year){
-    const ps = getPartnerState(partnerKey);
-    const buckets = Array.from({length:12}, ()=>({
-      vollIst:0, vollZiel:0,
-      beihilfeIst:0, beihilfeZiel:0,
-      zusatzIst:0, zusatzZiel:0,
-      pflegeIst:0, pflegeZiel:0,
-      bkvIst:0, bkvZiel:0,
-      reiseIst:0, reiseZiel:0,
-      gesamtIst:0, gesamtZiel:0,
-    }));
-
-    ps.records.forEach(r=>{
-      const ry = parseInt((r.datum||"").slice(0,4),10);
-      if (ry !== year) return;
-
-      // distribute yearly values equally to 12 months
-      const add = (k, v) => v/12;
-
-      const v = {
-        vollIst: moneyParse(r.vollIst),
-        vollZiel: moneyParse(r.vollZiel),
-        beihilfeIst: moneyParse(r.beihilfeIst),
-        beihilfeZiel: moneyParse(r.beihilfeZiel),
-        zusatzIst: moneyParse(r.zusatzIst),
-        zusatzZiel: moneyParse(r.zusatzZiel),
-        pflegeIst: moneyParse(r.pflegeIst),
-        pflegeZiel: moneyParse(r.pflegeZiel),
-        bkvIst: moneyParse(r.bkvIst),
-        bkvZiel: moneyParse(r.bkvZiel),
-        reiseIst: moneyParse(r.reiseIst),
-        reiseZiel: moneyParse(r.reiseZiel),
-        gesamtIst: moneyParse(r.gesamtIst),
-        gesamtZiel: moneyParse(r.gesamtZiel),
-      };
-
-      for (let m=0;m<12;m++){
-        const b = buckets[m];
-        Object.keys(v).forEach(k=> b[k] += add(k, v[k]));
-      }
-    });
-
-    return buckets;
+  function toast(msg, kind="ok"){
+    setStatus(msg, kind==="ok"?"ok":kind==="warn"?"warn":"bad");
+    setTimeout(()=>setStatus("bereit",""), 2000);
   }
 
-  function renderMonthTable(){
-    const year = parseInt($("yearSelect").value,10) || new Date().getFullYear();
-    const partnerKey = $("statsPartner").value || ACTIVE_PARTNER_KEY;
-    const buckets = monthlyBucketsForPartner(partnerKey, year);
-
-    const tb = $("monthTableTbody");
-    tb.innerHTML = "";
-    buckets.forEach((b,i)=>{
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><b>${MONTHS[i]}</b></td>
-        <td>${moneyFmt(b.vollIst)}</td>
-        <td>${moneyFmt(b.vollZiel)}</td>
-        <td>${moneyFmt(b.beihilfeIst)}</td>
-        <td>${moneyFmt(b.beihilfeZiel)}</td>
-        <td>${moneyFmt(b.zusatzIst)}</td>
-        <td>${moneyFmt(b.zusatzZiel)}</td>
-        <td>${moneyFmt(b.pflegeIst)}</td>
-        <td>${moneyFmt(b.pflegeZiel)}</td>
-        <td>${moneyFmt(b.bkvIst)}</td>
-        <td>${moneyFmt(b.bkvZiel)}</td>
-        <td>${moneyFmt(b.reiseIst)}</td>
-        <td>${moneyFmt(b.reiseZiel)}</td>
-        <td>${moneyFmt(b.gesamtIst)}</td>
-        <td>${moneyFmt(b.gesamtZiel)}</td>
-      `;
-      tb.appendChild(tr);
-    });
-  }
-
-  // ========= Bind inputs (main form) =========
+  // ========= Bind main inputs =========
   function bindMainInputs(){
-    // top fields
     $("rolle").oninput = () => { const r=getActiveRecord(); r.rolle=$("rolle").value; touch(r); renderRecordSelect(); };
     $("partnerNummer").oninput = () => { const r=getActiveRecord(); r.partnerNummer=$("partnerNummer").value; touch(r); };
-    $("datum").onchange = () => { const r=getActiveRecord(); r.datum=$("datum").value; touch(r); renderRecordSelect(); renderFollowupsGlobal(); renderYearTable(); renderMonthTable(); };
+    $("datum").onchange = () => { const r=getActiveRecord(); r.datum=$("datum").value; touch(r); renderRecordSelect(); renderFollowupsGlobal(); };
     $("mak").oninput = () => { const r=getActiveRecord(); r.makNummer=$("mak").value; touch(r); renderRecordSelect(); };
 
-    // stammdaten
-    $("vorname").oninput = () => {
-      const r=getActiveRecord();
-      r.vorname = $("vorname").value;
-      r.name = `${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim();
-      touch(r);
-      renderRecordSelect();
-    };
-    $("nachname").oninput = () => {
-      const r=getActiveRecord();
-      r.nachname = $("nachname").value;
-      r.name = `${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim();
-      touch(r);
-      renderRecordSelect();
-    };
+    $("vorname").oninput = () => { const r=getActiveRecord(); r.vorname=$("vorname").value; r.name=`${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim(); touch(r); renderRecordSelect(); };
+    $("nachname").oninput = () => { const r=getActiveRecord(); r.nachname=$("nachname").value; r.name=`${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim(); touch(r); renderRecordSelect(); };
 
-    $("firma").oninput = () => {
-      const r=getActiveRecord();
-      r.firma = $("firma").value;
-      const filled = applyAddressAutofillFromFirma();
-      r.strasse = $("strasse").value;
-      r.plz = $("plz").value;
-      r.ort = $("ort").value;
-      r.land = $("land").value || "DE";
-      touch(r);
-      if (filled) renderForm();
-    };
-
+    $("firma").oninput = () => { const r=getActiveRecord(); r.firma=$("firma").value; touch(r); };
     $("email").oninput = () => { const r=getActiveRecord(); r.email=$("email").value; touch(r); };
     $("mobil").oninput = () => { const r=getActiveRecord(); r.mobil=$("mobil").value; touch(r); };
     $("telefon").oninput = () => { const r=getActiveRecord(); r.telefon=$("telefon").value; touch(r); };
-
     $("strasse").oninput = () => { const r=getActiveRecord(); r.strasse=$("strasse").value; touch(r); };
     $("plz").oninput = () => { const r=getActiveRecord(); r.plz=$("plz").value; touch(r); };
     $("ort").oninput = () => { const r=getActiveRecord(); r.ort=$("ort").value; touch(r); };
@@ -1517,7 +1147,6 @@
 
     $("freiesFeld").oninput = () => { const r=getActiveRecord(); r.freiesFeld=$("freiesFeld").value; touch(r); };
 
-    // buttons
     $("btnAddContact").onclick = () => {
       const r=getActiveRecord();
       r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
@@ -1526,7 +1155,6 @@
       renderFollowupsGlobal();
     };
 
-    // copy/call/mail
     $("btnCopyAddress").onclick = async () => {
       const r=getActiveRecord();
       const txt = [r.firma, r.strasse, `${r.plz} ${r.ort}`.trim(), r.land].filter(Boolean).join("\n");
@@ -1550,25 +1178,6 @@
       if (!r.email) return toast("Keine E-Mail vorhanden", "warn");
       window.location.href = "mailto:"+encodeURIComponent(r.email);
     };
-  }
-
-  async function copyToClipboard(text){
-    try{
-      await navigator.clipboard.writeText(text || "");
-    }catch(e){
-      // fallback
-      const ta = document.createElement("textarea");
-      ta.value = text || "";
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-    }
-  }
-
-  function toast(msg, kind="ok"){
-    setStatus(msg, kind==="ok"?"ok":kind==="warn"?"warn":"bad");
-    setTimeout(()=>setStatus("bereit",""), 1800);
   }
 
   // ========= Records CRUD =========
@@ -1596,7 +1205,7 @@
     renderAll();
   }
 
-  // ========= Custom fields CRUD =========
+  // ========= Custom fields =========
   function addCustomField(){
     const ps = getActivePartnerState();
     const label = prompt("Feldname (Label):");
@@ -1624,15 +1233,18 @@
     if (!confirm(`Feld "${cf.label}" wirklich löschen? Werte in Datensätzen gehen verloren.`)) return;
 
     ps.customFields = ps.customFields.filter(x => x.id !== cf.id);
-    // remove values
-    ps.records.forEach(r => {
-      if (r.custom && cf.id in r.custom) delete r.custom[cf.id];
-    });
+    ps.records.forEach(r => { if (r.custom && cf.id in r.custom) delete r.custom[cf.id]; });
     saveDB(DB);
     renderAll();
   }
 
-  // ========= Export / Import / Merge =========
+  // ========= CSV Export =========
+  function csvCell(v){
+    const s = (v===null||v===undefined) ? "" : String(v);
+    if (/[;"\n\r]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+    return s;
+  }
+
   function downloadBlob(filename, blob){
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -1643,47 +1255,12 @@
     URL.revokeObjectURL(a.href);
   }
 
-  function exportFull(){
-    const data = JSON.stringify(DB, null, 2);
-    const blob = new Blob([data], {type:"application/json"});
-    downloadBlob("vertriebspartner_backup_full.json", blob);
-  }
-
-  function exportDelta(){
-    const day = todayISO();
-    const delta = { version: DB.version, exportedAt: nowISO(), kind:"delta", partners:{} };
-
-    PARTNERS.forEach(p=>{
-      const ps = getPartnerState(p.key);
-      const recs = ps.records.filter(r => (r.updatedAt||"").slice(0,10) === day);
-      if (recs.length){
-        delta.partners[p.key] = {
-          key: p.key,
-          customFields: ps.customFields,
-          records: recs,
-          activeRecordId: ps.activeRecordId
-        };
-      }
-    });
-
-    const blob = new Blob([JSON.stringify(delta, null, 2)], {type:"application/json"});
-    downloadBlob(`vertriebspartner_delta_${day}.json`, blob);
-  }
-
   function exportCSV(){
     const rows = [];
     const header = [
       "partner","reiter","datum","rolle","partnerNummer","mak",
       "favorit","vorname","nachname","firma","email","mobil","telefon",
-      "strasse","plz","ort","land",
-      "optin","onlineAbschluss",
-      "gesamtZiel","gesamtIst",
-      "vollZiel","vollIst",
-      "beihilfeZiel","beihilfeIst",
-      "zusatzZiel","zusatzIst",
-      "pflegeZiel","pflegeIst",
-      "bkvZiel","bkvIst",
-      "reiseZiel","reiseIst",
+      "strasse","plz","ort","land","optin","onlineAbschluss",
       "kontakte_count","naechste_wiedervorlage"
     ];
     rows.push(header);
@@ -1715,13 +1292,6 @@
           r.land||"",
           r.optin ? "Ja":"Nein",
           r.onlineAbschluss ? "Ja":"Nein",
-          r.gesamtZiel||"", r.gesamtIst||"",
-          r.vollZiel||"", r.vollIst||"",
-          r.beihilfeZiel||"", r.beihilfeIst||"",
-          r.zusatzZiel||"", r.zusatzIst||"",
-          r.pflegeZiel||"", r.pflegeIst||"",
-          r.bkvZiel||"", r.bkvIst||"",
-          r.reiseZiel||"", r.reiseIst||"",
           String((r.kontakte||[]).length),
           next
         ];
@@ -1734,29 +1304,87 @@
     downloadBlob("vertriebspartner_export.csv", blob);
   }
 
-  function csvCell(v){
-    const s = (v===null||v===undefined) ? "" : String(v);
-    if (/[;"\n\r]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
-    return s;
+  // ========= Exports (Delta / Full / SAFE Full) =========
+  function exportFull(){
+    const blob = new Blob([JSON.stringify(DB, null, 2)], {type:"application/json"});
+    downloadBlob("vertriebspartner_backup_full.json", blob);
   }
 
-  async function importFiles(fileList){
-    if (!fileList || !fileList.length) return;
+  function exportDelta(){
+    const day = todayISO();
+    const delta = { app: APP_NAME, format: "VP_DELTA", version: DB.version, exportedAt: nowISO(), kind:"delta", partners:{} };
 
-    const files = Array.from(fileList);
+    PARTNERS.forEach(p=>{
+      const ps = getPartnerState(p.key);
+      const recs = ps.records.filter(r => (r.updatedAt||"").slice(0,10) === day);
+      if (recs.length){
+        delta.partners[p.key] = {
+          key: p.key,
+          customFields: ps.customFields,
+          records: recs,
+          activeRecordId: ps.activeRecordId
+        };
+      }
+    });
+
+    const blob = new Blob([JSON.stringify(delta, null, 2)], {type:"application/json"});
+    downloadBlob(`vertriebspartner_delta_${day}.json`, blob);
+  }
+
+  // simple hash (not crypto) to detect "wrong file" / corruption
+  function quickHash(str){
+    let h = 2166136261;
+    for (let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return (h>>>0).toString(16);
+  }
+
+  function exportSafeFull(){
+    const payload = DB;
+    const payloadStr = JSON.stringify(payload);
+    const safe = {
+      format: APP_FORMAT,
+      app: APP_NAME,
+      build: APP_BUILD,
+      createdAt: nowISO(),
+      createdBy: sessionUserSafe(),
+      storageKey: STORAGE_KEY,
+      payloadHash: quickHash(payloadStr),
+      payload
+    };
+    const blob = new Blob([JSON.stringify(safe, null, 2)], {type:"application/json"});
+    downloadBlob(`SAFE_full_${todayISO()}.json`, blob);
+  }
+
+  // ========= IMPORT (FIXED) =========
+  async function readFiles(fileList){
+    const files = Array.from(fileList || []);
+    const arr = [];
     for (const f of files){
       const text = await f.text();
-      const incoming = safeJSONParse(text);
-      if (!incoming) { alert(`Ungültiges JSON: ${f.name}`); continue; }
-      mergeDB(incoming);
+      const json = safeJSONParse(text);
+      arr.push({ name:f.name, text, json });
     }
-    saveDB(DB);
-    toast("Import / Merge erledigt", "ok");
-    renderAll();
+    return arr;
   }
 
-  function mergeDB(incoming){
-    // Accept either full DB or delta with partners subset
+  function unwrapIfSafe(json){
+    if (json && json.format === APP_FORMAT && json.payload){
+      // verify hash
+      const str = JSON.stringify(json.payload);
+      const h = quickHash(str);
+      if (json.payloadHash && json.payloadHash !== h){
+        throw new Error("SAFE-Datei beschädigt oder verändert (Hash stimmt nicht).");
+      }
+      return json.payload;
+    }
+    return json;
+  }
+
+  function mergeIncomingIntoDB(incoming){
+    // incoming can be full DB or delta with partners subset
     const incPartners = incoming.partners || {};
     PARTNERS.forEach(p=>{
       const inc = incPartners[p.key];
@@ -1764,13 +1392,13 @@
 
       const ps = getPartnerState(p.key);
 
-      // custom fields: merge by id; append missing
+      // custom fields merge
       const byId = new Map(ps.customFields.map(c=>[c.id,c]));
       (inc.customFields || []).forEach(c=>{
         if (!byId.has(c.id)) { ps.customFields.push(c); byId.set(c.id,c); }
       });
 
-      // records: merge by id, choose newer updatedAt
+      // records merge by id + updatedAt
       const localById = new Map(ps.records.map(r=>[r.id,r]));
       (inc.records || []).forEach(rIn=>{
         const rLocal = localById.get(rIn.id);
@@ -1780,65 +1408,75 @@
         } else {
           const tL = Date.parse(rLocal.updatedAt||"") || 0;
           const tI = Date.parse(rIn.updatedAt||"") || 0;
-          if (tI >= tL){
-            // overwrite local with incoming
-            Object.assign(rLocal, rIn);
-          }
+          if (tI >= tL) Object.assign(rLocal, rIn);
         }
       });
 
-      // active record: keep local
       ps.activeRecordId ||= (ps.records[0] && ps.records[0].id);
     });
 
-    // ensure schema after merge
-    DB = loadDB();
+    DB = ensureSchema(DB);
+    saveDB(DB);
   }
 
-  // ========= Stats CSV export =========
-  function exportStatsCSV(){
-    const y = parseInt($("yearSelect").value,10) || new Date().getFullYear();
-    const lines = [];
-    lines.push(["typ","jahr","partner","monat","vollIst","vollZiel","beihilfeIst","beihilfeZiel","zusatzIst","zusatzZiel","pflegeIst","pflegeZiel","bkvIst","bkvZiel","reiseIst","reiseZiel","gesamtIst","gesamtZiel"].join(";"));
-
-    PARTNERS.forEach(p=>{
-      const buckets = monthlyBucketsForPartner(p.key, y);
-      buckets.forEach((b,i)=>{
-        lines.push([
-          "monat", y, p.name, MONTHS[i],
-          moneyFmt(b.vollIst), moneyFmt(b.vollZiel),
-          moneyFmt(b.beihilfeIst), moneyFmt(b.beihilfeZiel),
-          moneyFmt(b.zusatzIst), moneyFmt(b.zusatzZiel),
-          moneyFmt(b.pflegeIst), moneyFmt(b.pflegeZiel),
-          moneyFmt(b.bkvIst), moneyFmt(b.bkvZiel),
-          moneyFmt(b.reiseIst), moneyFmt(b.reiseZiel),
-          moneyFmt(b.gesamtIst), moneyFmt(b.gesamtZiel)
-        ].map(csvCell).join(";"));
-      });
-    });
-
-    const blob = new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8"});
-    downloadBlob(`auswertung_${y}.csv`, blob);
+  function replaceDB(incomingDB){
+    DB = ensureSchema(incomingDB);
+    saveDB(DB);
   }
 
-  // ========= Pages =========
-  function showPage(which){
-    const main = $("mainCard");
-    const stats = $("statsCard");
+  async function importMerge(files){
+    const arr = await readFiles(files);
+    for (const f of arr){
+      if (!f.json) { alert(`Ungültiges JSON: ${f.name}`); continue; }
+      let incoming;
+      try{
+        incoming = unwrapIfSafe(f.json);
+      }catch(e){
+        alert(`Import abgebrochen: ${f.name}\n${e.message}`);
+        continue;
+      }
 
-    if (which === "stats"){
-      $("tabMain").classList.remove("active");
-      $("tabStats").classList.add("active");
-      main.classList.add("hidden");
-      stats.classList.remove("hidden");
-      renderFollowupsGlobal();
-      renderYearTable();
-      renderMonthTable();
+      // detect types
+      if (incoming && incoming.format === "VP_DB" && incoming.partners){
+        // full DB
+        mergeIncomingIntoDB(incoming);
+      } else if (incoming && incoming.format === "VP_DELTA" && incoming.partners){
+        // delta
+        mergeIncomingIntoDB(incoming);
+      } else if (incoming && incoming.partners){
+        // older full backup (v2)
+        mergeIncomingIntoDB(incoming);
+      } else {
+        alert(`Datei nicht erkannt: ${f.name}`);
+      }
+    }
+    toast("Import/Merge erledigt", "ok");
+    renderAll();
+  }
+
+  async function importReplace(files){
+    if (!confirm("IMPORT (REPLACE): Dadurch wird deine lokale Datenbank komplett durch die Datei ersetzt. Fortfahren?")) return;
+
+    const arr = await readFiles(files);
+    if (!arr.length) return;
+
+    // take first file only
+    const f = arr[0];
+    if (!f.json) return alert("Ungültiges JSON.");
+
+    let incoming;
+    try{
+      incoming = unwrapIfSafe(f.json);
+    }catch(e){
+      return alert(`Import abgebrochen:\n${e.message}`);
+    }
+
+    if (incoming && incoming.partners){
+      replaceDB(incoming);
+      toast("Replace-Import erfolgreich", "ok");
+      renderAll();
     } else {
-      $("tabStats").classList.remove("active");
-      $("tabMain").classList.add("active");
-      stats.classList.add("hidden");
-      main.classList.remove("hidden");
+      alert("Datei enthält keine gültige DB.");
     }
   }
 
@@ -1860,13 +1498,19 @@
     $("btnNewField").onclick = () => addCustomField();
     $("btnDeleteField").onclick = () => deleteCustomField();
 
-    $("btnExportFull").onclick = () => exportFull();
     $("btnExportDelta").onclick = () => exportDelta();
+    $("btnExportFull").onclick = () => exportFull();
+    $("btnExportSafeFull").onclick = () => exportSafeFull();
     $("btnExportCSV").onclick = () => exportCSV();
 
-    $("btnImport").onclick = () => $("fileImport").click();
-    $("fileImport").onchange = (e) => {
-      importFiles(e.target.files);
+    $("btnImportMerge").onclick = () => { $("fileImport").dataset.mode = "merge"; $("fileImport").click(); };
+    $("btnImportReplace").onclick = () => { $("fileImport").dataset.mode = "replace"; $("fileImport").click(); };
+
+    $("fileImport").onchange = async (e) => {
+      const mode = $("fileImport").dataset.mode || "merge";
+      const files = e.target.files;
+      if (mode === "replace") await importReplace(files);
+      else await importMerge(files);
       e.target.value = "";
     };
 
@@ -1876,43 +1520,48 @@
 
     $("tabMain").onclick = () => showPage("main");
     $("tabStats").onclick = () => showPage("stats");
-
-    $("yearSelect").onchange = () => { renderYearTable(); renderMonthTable(); };
-    $("statsPartner").onchange = () => renderMonthTable();
-    $("btnStatsCSV").onclick = () => exportStatsCSV();
-    $("btnStatsPrint").onclick = () => window.print();
   }
 
-  // ========= Render all =========
+  // ========= Pages =========
+  function showPage(which){
+    const main = $("mainCard");
+    const stats = $("statsCard");
+    if (which === "stats"){
+      $("tabMain").classList.remove("active");
+      $("tabStats").classList.add("active");
+      main.classList.add("hidden");
+      stats.classList.remove("hidden");
+      renderFollowupsGlobal();
+    } else {
+      $("tabStats").classList.remove("active");
+      $("tabMain").classList.add("active");
+      stats.classList.add("hidden");
+      main.classList.remove("hidden");
+    }
+  }
+
   function renderAll(){
     DB = loadDB();
 
     const sess = getSession();
     const loggedIn = !!sess;
-
     $("who").textContent = loggedIn ? `${sess.user} (${sess.role})` : "nicht eingeloggt";
 
     $("loginCard").classList.toggle("hidden", loggedIn);
     $("navCard").classList.toggle("hidden", !loggedIn);
     $("mainCard").classList.toggle("hidden", !loggedIn);
-    $("statsCard").classList.add("hidden"); // default to main
+
+    $("statsCard").classList.add("hidden");
     $("tabMain").classList.add("active");
     $("tabStats").classList.remove("active");
 
-    if (!loggedIn){
-      setStatus("bereit", "");
-      return;
-    }
+    if (!loggedIn){ setStatus("bereit", ""); return; }
 
     setStatus("eingeloggt", "ok");
-
-    // partner theme
     document.body.setAttribute("data-partner", ACTIVE_PARTNER_KEY);
 
     renderPartnerTabs();
     renderRecordSelect();
-    renderYearSelect();
-    renderStatsPartnerSelect();
     renderForm();
     renderFollowupsGlobal();
   }
