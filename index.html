@@ -1,272 +1,234 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Vertriebspartner (Offline)</title>
   <style>
     :root{
-      --bg:#f3f7ff;
+      --bg:#eef4ff;
       --panel:#ffffff;
       --text:#0b1b33;
       --muted:#51627a;
-      --line:rgba(11,27,51,.14);
+      --line:rgba(11,27,51,.12);
       --shadow:0 10px 28px rgba(11,27,51,.10);
       --radius:18px;
-      --pad:18px;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-      /* default partner theme */
+      /* default partner theme (overridden via body[data-partner]) */
       --pf-main:#1d4ed8;
-      --pf-soft:rgba(29,78,216,.12);
-      --pf-soft2:rgba(29,78,216,.06);
+      --pf-soft:rgba(29,78,216,.14);
+      --pf-soft2:rgba(29,78,216,.08);
 
-      --ok:rgba(16,185,129,.18);
-      --warn:rgba(245,158,11,.18);
-      --bad:rgba(244,63,94,.18);
+      --green:rgba(16,185,129,.18);
+      --amber:rgba(245,158,11,.18);
+      --red:rgba(244,63,94,.18);
     }
 
+    /* Partner-Farben */
     body[data-partner="fonds_finanz"]{ --pf-main:#2563eb; --pf-soft:rgba(37,99,235,.14); --pf-soft2:rgba(37,99,235,.08); }
-    body[data-partner="demv"]{        --pf-main:#059669; --pf-soft:rgba(5,150,105,.14); --pf-soft2:rgba(5,150,105,.08); }
+    body[data-partner="demv"]{        --pf-main:#059669; --pf-soft:rgba(5,150,105,.14);  --pf-soft2:rgba(5,150,105,.08); }
     body[data-partner="taures"]{      --pf-main:#7c3aed; --pf-soft:rgba(124,58,237,.14); --pf-soft2:rgba(124,58,237,.08); }
-    body[data-partner="tvd"]{         --pf-main:#ea580c; --pf-soft:rgba(234,88,12,.14); --pf-soft2:rgba(234,88,12,.08); }
+    body[data-partner="tvd"]{         --pf-main:#ea580c; --pf-soft:rgba(234,88,12,.14);  --pf-soft2:rgba(234,88,12,.08); }
     body[data-partner="wir_finanz"]{  --pf-main:#0f766e; --pf-soft:rgba(15,118,110,.14); --pf-soft2:rgba(15,118,110,.08); }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:var(--sans);
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
       color:var(--text);
       background:
-        radial-gradient(1200px 800px at 15% 10%, var(--pf-soft), transparent 55%),
-        radial-gradient(1200px 800px at 85% 85%, var(--pf-soft2), transparent 55%),
-        linear-gradient(180deg, #eef4ff, var(--bg));
+        radial-gradient(1200px 800px at 15% 12%, var(--pf-soft), transparent 55%),
+        radial-gradient(1200px 800px at 85% 35%, var(--pf-soft2), transparent 55%),
+        linear-gradient(180deg,#f7faff,var(--bg));
     }
 
     header{
-      position:sticky; top:0; z-index:10;
-      background:rgba(243,247,255,.85);
-      backdrop-filter:saturate(180%) blur(10px);
+      position:sticky; top:0; z-index:20;
+      background:rgba(255,255,255,.75);
+      backdrop-filter: blur(10px);
       border-bottom:1px solid var(--line);
     }
-    .bar{
-      max-width:1240px; margin:0 auto;
-      padding:14px 18px;
+    .topbar{
       display:flex; align-items:center; gap:12px;
+      padding:14px 16px;
+      max-width:1280px; margin:0 auto;
     }
-    .brand{
-      display:flex; align-items:baseline; gap:10px; flex:1;
-      min-width:260px;
-    }
-    .brand b{ font-size:18px; }
+    .brand{display:flex; flex-direction:column; gap:4px; margin-right:8px}
+    .brand b{font-size:18px}
+    .mini{font-size:12px; color:var(--muted)}
     .pill{
       display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
       border:1px solid var(--line);
-      background:rgba(255,255,255,.7);
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:12px;
-      color:var(--muted);
+      background:rgba(255,255,255,.8);
+      font-size:12px; color:var(--muted);
       white-space:nowrap;
     }
-    .pill.ok{ background:var(--ok); border-color:rgba(16,185,129,.25); color:#065f46; }
-    .pill.warn{ background:var(--warn); border-color:rgba(245,158,11,.25); color:#7c5204; }
-    .pill.bad{ background:var(--bad); border-color:rgba(244,63,94,.25); color:#7f1d1d; }
+    .pill.ok{border-color:rgba(16,185,129,.30); background:rgba(16,185,129,.10); color:#065f46}
+    .pill.warn{border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.12); color:#92400e}
+    .pill.bad{border-color:rgba(244,63,94,.35); background:rgba(244,63,94,.12); color:#9f1239}
 
-    .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
-    .tabBtn{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.75);
-      padding:8px 12px;
-      border-radius:999px;
-      cursor:pointer;
-      font-weight:600;
-      font-size:13px;
-    }
-    .tabBtn.active{ background:var(--pf-soft); border-color:color-mix(in srgb, var(--pf-main) 30%, var(--line)); color:var(--pf-main); }
+    .spacer{flex:1}
 
-    .actions{
-      display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
-      align-items:center;
-    }
+    .actions{display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end}
     button, .btn{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.85);
-      padding:9px 12px;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:600;
-      font-size:13px;
-      box-shadow:0 1px 0 rgba(11,27,51,.04);
+      appearance:none; border:1px solid var(--line);
+      background:rgba(255,255,255,.9);
+      padding:9px 12px; border-radius:12px;
+      font-weight:600; cursor:pointer;
+      box-shadow:0 1px 0 rgba(0,0,0,.03);
     }
-    button.primary{ background:var(--pf-main); color:white; border-color:rgba(0,0,0,.0); }
-    button.ghost{ background:rgba(255,255,255,.65); }
-    button.danger{ border-color:rgba(244,63,94,.35); color:#b91c1c; background:rgba(255,255,255,.85); }
-    button:disabled{ opacity:.55; cursor:not-allowed; }
+    button:hover{border-color:rgba(29,78,216,.35)}
+    button.primary{background:var(--pf-main); color:white; border-color:transparent}
+    button.danger{background:rgba(244,63,94,.10); border-color:rgba(244,63,94,.35); color:#9f1239}
+    button.ghost{background:transparent}
+    button.tab{
+      padding:8px 12px; border-radius:999px;
+      background:transparent;
+    }
+    button.tab.active{
+      background:var(--pf-soft);
+      border-color:transparent;
+      color:var(--pf-main);
+    }
 
     .wrap{
-      max-width:1240px;
-      margin:0 auto;
-      padding:16px 18px 28px;
+      max-width:1280px; margin:18px auto;
+      padding:0 16px 26px;
       display:grid;
-      grid-template-columns: 380px 1fr; /* linke Seite größer */
+      grid-template-columns: 360px 1fr;
       gap:16px;
-    }
-    @media (max-width: 1020px){
-      .wrap{ grid-template-columns:1fr; }
+      align-items:start;
     }
 
     .card{
-      background:rgba(255,255,255,.78);
+      background:rgba(255,255,255,.86);
       border:1px solid var(--line);
-      box-shadow:var(--shadow);
       border-radius:var(--radius);
-      padding:var(--pad);
+      box-shadow:var(--shadow);
+      padding:16px;
     }
-    .h{
-      font-size:16px;
-      font-weight:800;
-      margin:0 0 10px;
-    }
-    .muted{ color:var(--muted); font-size:12px; }
-    .divider{ height:1px; background:var(--line); margin:14px 0; }
+    .h{font-size:18px; font-weight:800}
+    .muted{color:var(--muted); font-size:13px}
+    .divider{height:1px; background:var(--line); margin:14px 0}
 
-    .partnerTabs{ display:flex; gap:8px; flex-wrap:wrap; }
-    .partnerChip{
-      border:1px solid var(--line);
-      padding:8px 10px;
-      border-radius:999px;
-      cursor:pointer;
-      background:rgba(255,255,255,.8);
-      font-weight:700;
-      font-size:13px;
+    .tabsRow{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .partnerTabs{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .partnerTabs button{
+      padding:8px 12px; border-radius:999px;
+      background:rgba(255,255,255,.85);
     }
-    .partnerChip.active{
+    .partnerTabs button.active{
       background:var(--pf-soft);
-      border-color:color-mix(in srgb, var(--pf-main) 30%, var(--line));
+      border-color:transparent;
       color:var(--pf-main);
     }
 
-    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:700; }
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .field{
+      display:flex; flex-direction:column; gap:6px;
+      flex:1;
+      min-width:160px;
+    }
+    .field.w2{flex:0 0 calc(16.666% - 10px); min-width:160px}
+    .field.w3{flex:0 0 calc(25% - 10px); min-width:180px}
+    .field.w4{flex:0 0 calc(33.333% - 10px); min-width:180px}
+    .field.w5{flex:0 0 calc(41.666% - 10px); min-width:180px}
+    .field.w6{flex:0 0 calc(50% - 10px); min-width:220px}
+    .field.w12{flex:0 0 100%}
+
+    label{font-size:12px; color:var(--muted); font-weight:700}
     input, select, textarea{
-      width:100%;
-      padding:11px 12px;
-      border-radius:12px;
-      border:1px solid rgba(11,27,51,.18);
+      border:1px solid rgba(11,27,51,.16);
+      border-radius:14px;
+      padding:12px 12px;
+      font-size:14px;
       background:rgba(255,255,255,.92);
       outline:none;
-      font-size:14px;
-      color:var(--text);
     }
-    textarea{ min-height:86px; resize:vertical; }
     input:focus, select:focus, textarea:focus{
-      border-color:color-mix(in srgb, var(--pf-main) 45%, rgba(11,27,51,.18));
-      box-shadow:0 0 0 3px color-mix(in srgb, var(--pf-main) 20%, transparent);
+      border-color:rgba(29,78,216,.45);
+      box-shadow:0 0 0 4px rgba(29,78,216,.12);
     }
+    textarea{min-height:90px; resize:vertical}
 
-    .row{ display:grid; grid-template-columns: repeat(12, 1fr); gap:10px; }
-    .field{ grid-column: span 4; }
-    .w12{ grid-column: span 12; }
-    .w6{ grid-column: span 6; }
-    .w8{ grid-column: span 8; }
-    .w4{ grid-column: span 4; }
-    .w3{ grid-column: span 3; }
-    .w2{ grid-column: span 2; }
-
-    .mini{ font-size:12px; color:var(--muted); line-height:1.35; }
-    .small{ font-size:12px; }
-    .kpiRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-
-    .listRow{
-      display:flex; justify-content:space-between; align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border:1px solid rgba(11,27,51,.12);
-      border-radius:14px;
-      background:rgba(255,255,255,.7);
-      margin-top:8px;
-    }
-    .listRow b{ font-size:13px; }
-    .listRow .meta{ font-size:12px; color:var(--muted); margin-top:3px; }
-    .listRow .left{ min-width:0; }
-    .listRow .right{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-
-    .stammdatenBox{
-      border:1px solid color-mix(in srgb, var(--pf-main) 28%, rgba(11,27,51,.12));
-      background:linear-gradient(180deg, var(--pf-soft2), rgba(255,255,255,.92));
+    /* Stammdaten Highlight */
+    .stammBox{
+      border:1px solid color-mix(in srgb, var(--pf-main) 28%, transparent);
+      background: linear-gradient(180deg, var(--pf-soft2), rgba(255,255,255,.92));
       border-radius:16px;
       padding:14px;
-      margin:12px 0;
     }
-    .stammdatenTitle{
+    .stammTitle{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom:10px;
+      margin-bottom:12px;
     }
     .tag{
-      font-size:11px; letter-spacing:.04em;
-      text-transform:uppercase;
-      padding:5px 10px;
-      border-radius:999px;
-      background:var(--pf-soft);
-      color:var(--pf-main);
-      border:1px solid color-mix(in srgb, var(--pf-main) 35%, transparent);
-      font-weight:900;
-    }
-
-    .copyBtn{
       display:inline-flex; align-items:center; gap:8px;
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid rgba(11,27,51,.14);
-      background:rgba(255,255,255,.8);
-      cursor:pointer;
+      padding:6px 10px; border-radius:999px;
+      background:var(--pf-soft);
+      border:1px solid color-mix(in srgb, var(--pf-main) 35%, transparent);
+      color:var(--pf-main);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+    }
+    .iconRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .iconBtn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.85);
       font-weight:700;
+      cursor:pointer;
       font-size:12px;
     }
+    .iconBtn:hover{border-color:rgba(29,78,216,.35)}
+    .iconBtn.primary{background:var(--pf-main); color:#fff; border-color:transparent}
 
-    .table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      overflow:hidden;
-      border:1px solid rgba(11,27,51,.14);
-      border-radius:14px;
-      background:rgba(255,255,255,.78);
+    table{width:100%; border-collapse:separate; border-spacing:0}
+    th, td{font-size:12px; padding:10px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
+    th{color:var(--muted); font-weight:800; background:rgba(255,255,255,.65); position:sticky; top:0}
+    .tblWrap{max-height:360px; overflow:auto; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.7)}
+    .kpiGrid{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:12px}
+    .kpi{
+      border:1px solid var(--line); border-radius:14px; padding:12px;
+      background:rgba(255,255,255,.75);
     }
-    .table th,.table td{
-      padding:10px 10px;
-      font-size:12px;
-      border-bottom:1px solid rgba(11,27,51,.10);
-      white-space:nowrap;
-    }
-    .table th{ text-align:left; color:var(--muted); background:rgba(243,247,255,.8); font-weight:900; }
-    .table tr:last-child td{ border-bottom:none; }
+    .kpi b{display:block; font-size:12px; color:var(--muted)}
+    .kpi span{display:block; font-size:18px; font-weight:900; margin-top:4px}
 
-    .no-print{}
+    .hidden{display:none !important}
+
+    @media (max-width: 1020px){
+      .wrap{grid-template-columns:1fr}
+    }
+
     @media print{
-      header, .no-print{ display:none !important; }
-      body{ background:#fff; }
-      .wrap{ grid-template-columns:1fr; padding:0; }
-      .card{ box-shadow:none; }
+      header, .no-print{display:none !important}
+      body{background:#fff}
+      .wrap{grid-template-columns:1fr; max-width:100%; padding:0}
+      .card{box-shadow:none}
     }
   </style>
 </head>
 
 <body data-partner="fonds_finanz">
 <header class="no-print">
-  <div class="bar">
+  <div class="topbar">
     <div class="brand">
       <b>Vertriebspartner (Offline)</b>
-      <span id="statusPill" class="pill">bereit</span>
-      <span id="who" class="pill">nicht eingeloggt</span>
+      <div class="mini"><span id="who">nicht eingeloggt</span></div>
+    </div>
+    <span class="pill" id="statusPill">bereit</span>
+
+    <div class="tabsRow" style="margin-left:8px;">
+      <button class="tab active" id="tabMain">Hauptansicht</button>
+      <button class="tab" id="tabStats">Auswertung</button>
     </div>
 
-    <div class="tabs">
-      <button class="tabBtn active" id="tabMain">Hauptansicht</button>
-      <button class="tabBtn" id="tabStats">Auswertung</button>
-    </div>
+    <div class="spacer"></div>
 
     <div class="actions">
       <span class="pill">localStorage · offline</span>
@@ -277,27 +239,25 @@
       <button id="btnExportFull">Export (Voll)</button>
       <button id="btnExportCSV">CSV Export</button>
       <button id="btnImport">Import / Merge</button>
-      <input id="fileImport" type="file" accept="application/json" multiple style="display:none" />
+      <input id="fileImport" type="file" accept="application/json" multiple class="hidden">
       <button class="danger" id="btnLogout">Logout</button>
     </div>
   </div>
 </header>
 
 <div class="wrap">
-  <!-- LEFT -->
+  <!-- LOGIN / NAV -->
   <aside class="card" id="loginCard">
     <div class="h">Login (offline)</div>
-    <div class="muted">Diese App speichert lokal im Browser. Für tägliches Zusammenführen bitte Export/Import nutzen.</div>
+    <div class="muted" style="margin-top:6px;">
+      Diese App speichert lokal im Browser. Für tägliches Zusammenführen bitte Export/Import nutzen.
+    </div>
 
     <div class="row" style="margin-top:12px;">
       <div class="field w6">
         <label>Benutzer</label>
         <input id="loginUser" list="userList" placeholder="Benutzer eingeben…" autocomplete="username">
-        <datalist id="userList">
-          <option value="master"></option>
-          <option value="user1"></option>
-          <option value="user2"></option>
-        </datalist>
+        <datalist id="userList"></datalist>
       </div>
       <div class="field w6">
         <label>Passwort</label>
@@ -306,16 +266,9 @@
     </div>
 
     <div class="row" style="margin-top:12px;">
-      <div class="field w6">
-        <button class="primary" id="btnLogin" style="width:100%;">Login</button>
-      </div>
-      <div class="field w6">
-        <button class="ghost" id="btnClearLocal" style="width:100%;">Lokale Daten löschen</button>
-      </div>
-    </div>
-
-    <div style="margin-top:10px;">
-      <span id="loginHint" class="pill">—</span>
+      <button class="primary" id="btnLogin" style="width:180px">Login</button>
+      <button class="ghost" id="btnClearLocal" title="Löscht nur die lokalen Daten dieses Browsers">Lokale Daten löschen</button>
+      <span class="pill" id="loginHint">—</span>
     </div>
 
     <div class="divider"></div>
@@ -323,37 +276,38 @@
     <div class="mini">
       <div><b>Hinweis:</b> Offline-„Zugriffsschutz“ ist nur so sicher wie das Gerät selbst.</div>
       <div>Empfehlung: Geräte passwortgeschützt halten.</div>
-      <div style="margin-top:8px;"><b>Passwörter ändern:</b> Im Code unten bei <span style="font-family:var(--mono)">USERS</span>.</div>
     </div>
   </aside>
 
-  <aside class="card" id="navCard" style="display:none;">
+  <aside class="card hidden" id="navCard">
     <div class="h">Partner</div>
     <div class="partnerTabs" id="partnerTabs"></div>
 
     <div class="divider"></div>
 
     <div class="h">Reiter / Datensatz</div>
-    <select id="recordSelect"></select>
+    <select id="recordSelect" style="margin-top:10px;"></select>
+
     <div class="row" style="margin-top:10px;">
-      <div class="field w6"><button id="btnNewTab" style="width:100%;">+ Neuer Reiter</button></div>
-      <div class="field w6"><button class="danger" id="btnDeleteTab" style="width:100%;">Reiter löschen</button></div>
+      <button id="btnNewTab">+ Neuer Reiter</button>
+      <button class="danger" id="btnDeleteTab">Reiter löschen</button>
     </div>
 
     <div class="divider"></div>
 
     <div class="h">Suche</div>
-    <input id="q" placeholder="Name / Firma / E-Mail / Rolle / MAK / Anlass / Notiz …"/>
-    <div class="row" style="margin-top:10px;">
-      <div class="field w6"><button id="btnFind" style="width:100%;">Trefferliste</button></div>
-      <div class="field w6"><button class="ghost" id="btnCloseResults" style="width:100%;">Schließen</button></div>
-    </div>
+    <input id="q" placeholder="Name / Firma / E-Mail / Rolle / MAK / Anlass …">
     <div class="muted" style="margin-top:6px;">Suche innerhalb der lokal gespeicherten Daten.</div>
+
+    <div class="row" style="margin-top:10px;">
+      <button id="btnFind">Trefferliste</button>
+      <button class="ghost" id="btnCloseResults">Schließen</button>
+    </div>
 
     <div class="divider"></div>
 
     <div class="mini">
-      <div><b>Sync-Workflow täglich (2 Mitarbeiter):</b></div>
+      <div><b>Sync-Workflow täglich:</b></div>
       <ol style="margin:8px 0 0 18px;padding:0;">
         <li>Mitarbeiter: „Export (Delta heute)“</li>
         <li>Du: „Import / Merge“ (beide Dateien)</li>
@@ -362,449 +316,415 @@
     </div>
   </aside>
 
-  <!-- RIGHT -->
-  <main class="card" id="mainCard" style="display:none;">
-    <div id="viewMain">
-      <div class="h">Datensatz</div>
-      <div class="muted">Autosave: Änderungen werden sofort lokal gespeichert.</div>
-
-      <div class="row" style="margin-top:12px;">
-        <div class="field w6">
-          <label>Rolle (frei)</label>
-          <input id="rolle" placeholder="z. B. RDPartner / DirektPartner / Account / …"/>
-        </div>
-        <div class="field w3" id="makWrap" style="display:none;">
-          <label>MAK (nur Fonds/DEMV)</label>
-          <input id="mak" placeholder="MAK-Nummer"/>
-        </div>
-        <div class="field w3">
-          <label>Datum (Reiter)</label>
-          <input id="datum" type="date"/>
-        </div>
+  <!-- MAIN -->
+  <main class="card hidden" id="mainCard">
+    <div style="display:flex; align-items:flex-start; gap:12px; justify-content:space-between;">
+      <div>
+        <div class="h">Datensatz</div>
+        <div class="muted">Autosave: Änderungen werden sofort lokal gespeichert.</div>
       </div>
-
-      <div class="stammdatenBox">
-        <div class="stammdatenTitle">
-          <div class="tag">Stammdaten</div>
-          <div class="small muted">Name · Firma · E-Mail · Tel/Mobil · Adresse</div>
-        </div>
-
-        <div class="row">
-          <div class="field w6"><label>Name</label><input id="name"/></div>
-          <div class="field w6"><label>Firma</label><input id="firma"/></div>
-          <div class="field w12"><label>E-Mail</label><input id="email" type="email"/></div>
-        </div>
-
-        <div class="row" style="margin-top:10px;">
-          <div class="field w6"><label>Mobil</label><input id="mobil" type="tel"/></div>
-          <div class="field w6"><label>Telefon</label><input id="telefon" type="tel"/></div>
-        </div>
-
-        <div class="row" style="margin-top:10px;">
-          <div class="field w6"><label>Straße</label><input id="strasse"/></div>
-          <div class="field w2"><label>PLZ</label><input id="plz"/></div>
-          <div class="field w4"><label>Ort</label><input id="ort"/></div>
-        </div>
-
-        <div class="row" style="margin-top:10px;">
-          <div class="field w3"><label>Land</label><input id="land"/></div>
-          <div class="field w6">
-            <label>Adresse kopieren</label>
-            <button class="copyBtn" id="btnCopyAddr" type="button">📍 kopieren</button>
-          </div>
-          <div class="field w3">
-            <label>Tel/Mobil kopieren</label>
-            <button class="copyBtn" id="btnCopyPhone" type="button">📞 kopieren</button>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px;">
-          <div class="field w6">
-            <label>E-Mail</label>
-            <button class="copyBtn" id="btnMail" type="button">✉️ E-Mail</button>
-          </div>
-          <div class="field w6">
-            <label>Anrufen</label>
-            <button class="copyBtn" id="btnCall" type="button">📞 Anrufen</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:10px;">
-        <div class="field w6">
-          <label>Optin</label>
-          <select id="optin">
-            <option value="false">Nein</option>
-            <option value="true">Ja</option>
-          </select>
-        </div>
-        <div class="field w6">
-          <label>Online Abschluss</label>
-          <select id="online">
-            <option value="false">Nein</option>
-            <option value="true">Ja</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="h">Produktion (Jahreswerte €)</div>
-      <div class="muted">Diese Werte sind pro Jahr. In der Auswertung werden sie (optional) auf Monate verteilt dargestellt.</div>
-
-      <div class="row" style="margin-top:12px;">
-        <div class="field w3"><label>Prod Voll</label><input id="prodVoll" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Ziel Voll</label><input id="zielVoll" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Prod Beihilfe</label><input id="prodBeihilfe" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Ziel Beihilfe</label><input id="zielBeihilfe" inputmode="decimal" placeholder="€"/></div>
-      </div>
-
-      <div class="row" style="margin-top:10px;">
-        <div class="field w3"><label>Prod Zusatz</label><input id="prodZusatz" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Ziel Zusatz</label><input id="zielZusatz" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Prod bKV</label><input id="prodBkv" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Ziel bKV</label><input id="zielBkv" inputmode="decimal" placeholder="€"/></div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="h">Kontakt-Historie (Kontakt 1, 2, 3 … inkl. Wiedervorlage)</div>
-      <div class="muted">Jeder Kontakt kann ein Follow-up (Wiedervorlage) haben. Diese erscheinen auch in der Gesamt-Übersicht (Auswertung).</div>
-
-      <div id="kontakteHost" style="margin-top:10px;"></div>
-      <div class="row" style="margin-top:10px;">
-        <div class="field w6"><button id="btnAddKontakt" class="ghost" style="width:100%;">+ Kontakt hinzufügen</button></div>
-        <div class="field w6"><button id="btnMarkAllDone" class="ghost" style="width:100%;">Alle Wiedervorlagen erledigt</button></div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="h">Freies Feld</div>
-      <textarea id="freiesFeld" placeholder="Notizen …"></textarea>
-
-      <div id="customFieldsHost"></div>
+      <div class="pill" id="autosavePill">ok</div>
     </div>
 
-    <div id="viewStats" style="display:none;">
-      <div class="h">Auswertung</div>
-      <div class="muted">Jahresauswertung (Monat) + Gesamtproduktion (Jahr) Ziel/Ist (€) + Gesamt-Wiedervorlagen über alle Partner.</div>
+    <!-- Top row: Rolle + Partnernummer + MAK + Datum -->
+    <div class="row" style="margin-top:12px;">
+      <div class="field w5">
+        <label>Rolle (frei)</label>
+        <input id="rolle" placeholder="z. B. RDPartner / DirektPartner / Account / …">
+      </div>
 
-      <div class="divider"></div>
+      <div class="field w3">
+        <label>Partnernummer</label>
+        <input id="partnerNummer" placeholder="Partnernummer">
+      </div>
 
-      <div class="h">Wiedervorlagen – alle Partner</div>
-      <div class="muted">Offene Wiedervorlagen über alle Partner & Reiter. Klick auf „Öffnen“ springt in den Datensatz.</div>
-      <div id="followUpAllHost" style="margin-top:10px;"></div>
+      <div class="field w2" id="makWrap">
+        <label>MAK (nur Fonds/DEMV)</label>
+        <input id="mak" placeholder="MAK-Nummer">
+      </div>
 
-      <div class="divider"></div>
+      <div class="field w2">
+        <label>Datum (Reiter)</label>
+        <input id="datum" type="date">
+      </div>
+    </div>
+
+    <!-- Stammdaten -->
+    <div class="stammBox" style="margin-top:14px;">
+      <div class="stammTitle">
+        <div class="tag">Stammdaten</div>
+        <div class="mini">Vorname · Nachname · Firma · E-Mail · Tel/Mobil · Adresse</div>
+      </div>
 
       <div class="row">
-        <div class="field w6">
-          <label>Partner (Auswertung)</label>
-          <select id="statsPartner"></select>
+        <div class="field w6"><label>Vorname</label><input id="vorname" placeholder="Vorname"></div>
+        <div class="field w6"><label>Nachname</label><input id="nachname" placeholder="Nachname"></div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field w6"><label>Firma</label><input id="firma" placeholder="Unternehmen / Einheit"></div>
+        <div class="field w6"><label>E-Mail</label><input id="email" placeholder="name@firma.de"></div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field w6"><label>Mobil</label><input id="mobil" type="tel" placeholder="+49 …"></div>
+        <div class="field w6"><label>Telefon</label><input id="telefon" type="tel" placeholder="z. B. 0711 …"></div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field w6"><label>Straße</label><input id="strasse" placeholder="Straße + Nr."></div>
+        <div class="field w2"><label>PLZ</label><input id="plz" placeholder="12345"></div>
+        <div class="field w4"><label>Ort</label><input id="ort" placeholder="Ort"></div>
+        <div class="field w2"><label>Land</label><input id="land" placeholder="DE"></div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field w4">
+          <label>Favorit</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input id="favorit" type="checkbox" style="width:auto; transform:scale(1.2);">
+            <span class="muted">als Favorit markieren (★ im Reiter)</span>
+          </div>
         </div>
-        <div class="field w6">
-          <label>Jahr</label>
-          <select id="statsYear"></select>
+        <div class="field w4">
+          <label>Optin</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input id="optin" type="checkbox" style="width:auto; transform:scale(1.2);">
+            <span class="muted">Einwilligung liegt vor</span>
+          </div>
+        </div>
+        <div class="field w4">
+          <label>Online Abschluss</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input id="online" type="checkbox" style="width:auto; transform:scale(1.2);">
+            <span class="muted">wird / wurde online abgeschlossen</span>
+          </div>
         </div>
       </div>
 
-      <div class="divider"></div>
-
-      <div class="h">Gesamtproduktion (Jahr) – manuell</div>
-      <div class="muted">Diese Werte überschreibst du manuell (Ziel/Ist). Pro Partner & Jahr gespeichert.</div>
-
-      <div class="row" style="margin-top:10px;">
-        <div class="field w6"><label>Gesamt Ziel</label><input id="gesamtZiel" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w6"><label>Gesamt Ist</label><input id="gesamtIst" inputmode="decimal" placeholder="€"/></div>
-      </div>
-
-      <div class="row" style="margin-top:10px;">
-        <div class="field w3"><label>Voll Ziel</label><input id="vollZiel" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Voll Ist</label><input id="vollIst" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Beihilfe Ziel</label><input id="beihilfeZiel" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Beihilfe Ist</label><input id="beihilfeIst" inputmode="decimal" placeholder="€"/></div>
-      </div>
-
-      <div class="row" style="margin-top:10px;">
-        <div class="field w3"><label>Zusatz Ziel</label><input id="zusatzZiel" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>Zusatz Ist</label><input id="zusatzIst" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>bKV Ziel</label><input id="bkvZiel" inputmode="decimal" placeholder="€"/></div>
-        <div class="field w3"><label>bKV Ist</label><input id="bkvIst" inputmode="decimal" placeholder="€"/></div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="h">Jahresauswertung (Monat)</div>
-      <div class="muted">Basis: Datensätze/Reiter des gewählten Partners. Jahreswerte werden gleichmäßig auf 12 Monate verteilt (damit du eine Monatsübersicht bekommst).</div>
-
-      <div style="overflow:auto;">
-        <table class="table" id="monthTable">
-          <thead>
-            <tr>
-              <th>Monat</th>
-              <th>Prod Voll</th><th>Ziel Voll</th>
-              <th>Prod Beihilfe</th><th>Ziel Beihilfe</th>
-              <th>Prod Zusatz</th><th>Ziel Zusatz</th>
-              <th>Prod bKV</th><th>Ziel bKV</th>
-              <th>Gesamt Prod</th><th>Gesamt Ziel</th>
-            </tr>
-          </thead>
-          <tbody id="monthTBody"></tbody>
-        </table>
-      </div>
-
-      <div class="row no-print" style="margin-top:12px;">
-        <div class="field w6"><button id="btnStatsCsv">CSV Export (Auswertung)</button></div>
-        <div class="field w6"><button id="btnStatsPrint">Drucken (Auswertung)</button></div>
+      <div class="iconRow">
+        <button class="iconBtn" id="btnCopyAddress">📍 Adresse kopieren</button>
+        <button class="iconBtn" id="btnCopyPhone">📞 Tel/Mobil kopieren</button>
+        <button class="iconBtn" id="btnCall">📞 Anrufen</button>
+        <button class="iconBtn primary" id="btnMail">✉️ E-Mail</button>
       </div>
     </div>
-  </main>
-</div>
 
-<!-- Trefferliste -->
-<div class="wrap no-print" id="resultsWrap" style="display:none;">
-  <div class="card" style="grid-column: 1 / -1;">
-    <div class="h">Trefferliste</div>
-    <div class="muted">Klicke auf einen Treffer, um direkt zu Partner & Datensatz zu springen.</div>
-    <div id="resultsHost" style="margin-top:10px;"></div>
-  </div>
+    <div class="divider"></div>
+
+    <!-- Kontakte / Wiedervorlagen -->
+    <div class="h">Kontakt-Historie (Kontakt 1, 2, … inkl. Wiedervorlage)</div>
+    <div class="muted" style="margin-top:6px;">
+      Jeder Kontakt enthält optional eine Wiedervorlage (Follow-up Datum + Thema) und „erledigt“.
+    </div>
+
+    <div id="contactsWrap" style="margin-top:12px;"></div>
+
+    <div class="row" style="margin-top:10px;">
+      <button id="btnAddContact">+ Kontakt hinzufügen</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Freies Feld -->
+    <div class="h">Freies Feld</div>
+    <textarea id="freiesFeld" placeholder="Notizen …" style="margin-top:10px;"></textarea>
+
+    <div class="divider"></div>
+
+    <!-- Custom Fields -->
+    <div class="h">Zusatzfelder (Custom)</div>
+    <div class="muted" style="margin-top:6px;">Partnerbezogene Zusatzfelder (werden oben über „Neue Felder erstellen“ angelegt).</div>
+    <div id="customFieldsWrap" style="margin-top:12px;"></div>
+  </main>
+
+  <!-- STATS -->
+  <main class="card hidden" id="statsCard">
+    <div class="h">Auswertung</div>
+    <div class="muted" style="margin-top:6px;">
+      1) Globale Wiedervorlagen-Übersicht (über alle 5 Partner) · 2) Jahreswerte Ziel/Ist pro Datensatz · 3) Monatstabelle (Jahreswerte optional auf Monate verteilt).
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="h">Offene Wiedervorlagen (global)</div>
+    <div class="muted" style="margin-top:6px;">Alle offenen Follow-ups aus der Kontakt-Historie über Fonds Finanz, DEMV, Taures, TVD, WIR-Finanz.</div>
+    <div class="tblWrap" style="margin-top:12px;">
+      <table>
+        <thead>
+        <tr>
+          <th>Fällig</th>
+          <th>Partner</th>
+          <th>Reiter</th>
+          <th>Kontakt</th>
+          <th>Anlass</th>
+          <th>Thema (Wiedervorlage)</th>
+          <th>Notiz</th>
+        </tr>
+        </thead>
+        <tbody id="followupsTbody"></tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row" style="align-items:flex-end;">
+      <div class="field w3">
+        <label>Jahr</label>
+        <select id="yearSelect"></select>
+      </div>
+      <div class="field w3">
+        <label>Partner (für Monatstabelle)</label>
+        <select id="statsPartner"></select>
+      </div>
+      <div class="field w3">
+        <button id="btnStatsCSV">CSV Export (Auswertung)</button>
+      </div>
+      <div class="field w3">
+        <button id="btnStatsPrint">Drucken</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="h">Jahresübersicht Ziel / Ist (€) – manuell (pro Reiter)</div>
+    <div class="muted" style="margin-top:6px;">
+      Diese Werte sind Jahreswerte und werden im Datensatz eingetragen. In der Monatstabelle werden sie optional gleichmäßig auf 12 Monate verteilt.
+    </div>
+
+    <div class="tblWrap" style="margin-top:12px;">
+      <table>
+        <thead>
+        <tr>
+          <th>Partner</th>
+          <th>Reiter</th>
+          <th>Gesamt Ziel</th>
+          <th>Gesamt Ist</th>
+          <th>Voll Ziel</th>
+          <th>Voll Ist</th>
+          <th>Beihilfe Ziel</th>
+          <th>Beihilfe Ist</th>
+          <th>Zusatz Ziel</th>
+          <th>Zusatz Ist</th>
+          <th>Pflege Ziel</th>
+          <th>Pflege Ist</th>
+          <th>bKV Ziel</th>
+          <th>bKV Ist</th>
+          <th>Reise Ziel</th>
+          <th>Reise Ist</th>
+        </tr>
+        </thead>
+        <tbody id="yearTableTbody"></tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="h">Monatstabelle (Jahreswerte → Monat)</div>
+    <div class="muted" style="margin-top:6px;">Summen über alle Reiter des ausgewählten Partners. Jahreswerte werden /12 auf Monate verteilt.</div>
+
+    <div class="tblWrap" style="margin-top:12px; max-height:420px;">
+      <table>
+        <thead>
+        <tr>
+          <th>Monat</th>
+          <th>Voll Ist</th>
+          <th>Voll Ziel</th>
+          <th>Beihilfe Ist</th>
+          <th>Beihilfe Ziel</th>
+          <th>Zusatz Ist</th>
+          <th>Zusatz Ziel</th>
+          <th>Pflege Ist</th>
+          <th>Pflege Ziel</th>
+          <th>bKV Ist</th>
+          <th>bKV Ziel</th>
+          <th>Reise Ist</th>
+          <th>Reise Ziel</th>
+          <th>Gesamt Ist</th>
+          <th>Gesamt Ziel</th>
+        </tr>
+        </thead>
+        <tbody id="monthTableTbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- RESULTS OVERLAY -->
+  <section class="card hidden" id="resultsCard" style="grid-column: 1 / -1;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+      <div>
+        <div class="h">Trefferliste</div>
+        <div class="muted">Klicke einen Treffer, um den Datensatz zu öffnen.</div>
+      </div>
+      <button class="ghost" id="btnCloseResults2">Schließen</button>
+    </div>
+    <div class="tblWrap" style="margin-top:12px; max-height:420px;">
+      <table>
+        <thead>
+        <tr>
+          <th>Partner</th>
+          <th>Reiter</th>
+          <th>Rolle</th>
+          <th>MAK</th>
+          <th>Partnernr</th>
+          <th>Name</th>
+          <th>Firma</th>
+          <th>E-Mail</th>
+          <th>Tel/Mobil</th>
+          <th>Ort</th>
+        </tr>
+        </thead>
+        <tbody id="resultsTbody"></tbody>
+      </table>
+    </div>
+  </section>
 </div>
 
 <script>
 (() => {
-  "use strict";
-
-  // =======================
-  // Konfiguration
-  // =======================
-  // Ändere hier Benutzer/Passwörter:
-  const USERS = [
-    { user:"master", pass:"master123", role:"master" },
-    { user:"user1",  pass:"user123",   role:"staff"  },
-    { user:"user2",  pass:"user123",   role:"staff"  }
-  ];
-
+  // ========= Config =========
   const PARTNERS = [
     { key:"fonds_finanz", name:"Fonds Finanz", hasMak:true },
-    { key:"demv",        name:"DEMV",         hasMak:true },
-    { key:"taures",      name:"Taures",       hasMak:false },
-    { key:"tvd",         name:"TVD",          hasMak:false },
-    { key:"wir_finanz",  name:"WIR-Finanz",   hasMak:false }
+    { key:"demv",        name:"DEMV",        hasMak:true },
+    { key:"taures",      name:"Taures",      hasMak:false },
+    { key:"tvd",         name:"TVD",         hasMak:false },
+    { key:"wir_finanz",  name:"WIR-Finanz",  hasMak:false },
   ];
 
-  // Adresse Autofill: Firma -> Adresse
-  const ADDRESS_BOOK = [
-    {
-      match: /fonds\s*finanz\s*maklerservice\s*gmbh/i,
-      strasse:"Riesstraße 25",
-      plz:"80992",
-      ort:"München",
-      land:"DE"
-    }
-  ];
-
-  // Storage Keys
   const STORAGE_KEY = "vp_offline_db_v2";
-  const SESSION_KEY = "vp_offline_user_v1";
+  const SESSION_KEY = "vp_offline_session_v2";
+  const USERS_KEY   = "vp_offline_users_v2";
 
-  // =======================
-  // Helpers
-  // =======================
+  const MONTHS = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+
   const $ = (id) => document.getElementById(id);
 
-  const nowISO = () => new Date().toISOString();
-  const todayISO = () => new Date().toISOString().slice(0,10);
-  const currentYear = () => new Date().getFullYear();
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+  function nowISO(){ return new Date().toISOString(); }
+  function uid(){ return Math.random().toString(36).slice(2,10)+"-"+Date.now().toString(36); }
 
-  function safeJSONParse(s){
-    try { return JSON.parse(s); } catch(e){ return null; }
+  function safeJSONParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
+
+  function setStatus(text, kind=""){
+    const p = $("statusPill");
+    p.textContent = text;
+    p.className = "pill " + (kind || "");
   }
 
-  function escapeHtml(s){
-    return String(s ?? "").replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[m]));
+  // ========= Users / Session =========
+  function loadUsers(){
+    const raw = localStorage.getItem(USERS_KEY);
+    const u = safeJSONParse(raw);
+    if (u && Array.isArray(u.list)) return u;
+
+    // default
+    const seed = {
+      list: [
+        { user:"master", pass:"master", role:"master" },
+        { user:"user1", pass:"user1", role:"staff" },
+        { user:"user2", pass:"user2", role:"staff" },
+      ],
+      updatedAt: nowISO()
+    };
+    localStorage.setItem(USERS_KEY, JSON.stringify(seed));
+    return seed;
   }
 
-  function moneyParse(v){
-    if (v === null || v === undefined) return 0;
-    const s = String(v).trim();
-    if (!s) return 0;
-    // allow "12.345,67" or "12345.67"
-    const norm = s.replace(/\./g,"").replace(",",".").replace(/[^\d.-]/g,"");
-    const n = Number(norm);
-    return Number.isFinite(n) ? n : 0;
+  function saveUsers(u){
+    u.updatedAt = nowISO();
+    localStorage.setItem(USERS_KEY, JSON.stringify(u));
   }
 
-  function moneyFormat(n){
-    if (!Number.isFinite(n)) return "";
-    return n.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  }
-
-  function uid(){
-    return Math.random().toString(36).slice(2,10) + "-" + Date.now().toString(36);
-  }
-
-  function setStatus(text, kind){
-    const pill = $("statusPill");
-    pill.textContent = text;
-    pill.className = "pill" + (kind ? (" " + kind) : "");
-  }
-
-  // =======================
-  // Session
-  // =======================
   function getSession(){
     const raw = localStorage.getItem(SESSION_KEY);
     return raw ? safeJSONParse(raw) : null;
   }
-  function setSession(session){
-    if (!session) localStorage.removeItem(SESSION_KEY);
-    else localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+  function setSession(sess){
+    if (!sess) localStorage.removeItem(SESSION_KEY);
+    else localStorage.setItem(SESSION_KEY, JSON.stringify(sess));
     renderAll();
   }
+
   function sessionUserSafe(){
     const s = getSession();
     return (s && s.user) ? s.user : "unknown";
   }
 
-  // =======================
-  // DB
-  // =======================
-  function emptyPartnerState(){
-    return {
-      records: [],
-      activeRecordId: null,
-      customFields: [],     // {id,label,type}
-      yearStats: {}         // { [year]: {gesamtZiel,gesamtIst, vollZiel,vollIst, ...} }
+  function initLoginUI(){
+    const u = loadUsers();
+    const dl = $("userList");
+    dl.innerHTML = "";
+    u.list.forEach(x => {
+      const opt = document.createElement("option");
+      opt.value = x.user;
+      dl.appendChild(opt);
+    });
+
+    $("btnLogin").onclick = () => {
+      const user = ($("loginUser").value || "").trim();
+      const pass = ($("loginPass").value || "").trim();
+      if (!user || !pass){
+        $("loginHint").textContent = "Bitte Benutzer + Passwort eingeben";
+        $("loginHint").className = "pill warn";
+        return;
+      }
+
+      const users = loadUsers();
+      const found = users.list.find(x => x.user === user);
+
+      // Free-field behaviour:
+      // - If user exists: verify password
+      // - If not exists: create new staff user with given password
+      if (found){
+        if (found.pass !== pass){
+          $("loginHint").textContent = "Login fehlgeschlagen";
+          $("loginHint").className = "pill bad";
+          return;
+        }
+        setSession({ user: found.user, role: found.role, loginAt: nowISO() });
+        $("loginHint").textContent = "OK";
+        $("loginHint").className = "pill ok";
+      } else {
+        users.list.push({ user, pass, role:"staff" });
+        saveUsers(users);
+        initLoginUI();
+        setSession({ user, role:"staff", loginAt: nowISO() });
+        $("loginHint").textContent = "Neuer Benutzer angelegt";
+        $("loginHint").className = "pill ok";
+      }
+    };
+
+    $("btnClearLocal").onclick = () => {
+      if (!confirm("Wirklich alle lokalen Daten (DB + Session) in diesem Browser löschen?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(SESSION_KEY);
+      // Users lassen wir absichtlich drin (sonst sperrst du dich ggf. aus)
+      renderAll();
     };
   }
 
-  function defaultDB(){
+  // ========= DB Model =========
+  function emptyDB(){
     const partners = {};
-    PARTNERS.forEach(p => partners[p.key] = emptyPartnerState());
+    PARTNERS.forEach(p => {
+      partners[p.key] = {
+        key: p.key,
+        customFields: [],
+        records: [],
+        activeRecordId: null
+      };
+      // ensure at least one record
+      const r = baseRecord(p);
+      partners[p.key].records.push(r);
+      partners[p.key].activeRecordId = r.id;
+    });
     return {
       version: 2,
       createdAt: nowISO(),
       updatedAt: nowISO(),
-      activePartnerKey: PARTNERS[0].key,
       partners
     };
-  }
-
-  function loadDB(){
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? safeJSONParse(raw) : null;
-    if (!parsed || !parsed.partners) {
-      const db = defaultDB();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-      return db;
-    }
-
-    // Migrations / Ensure keys
-    PARTNERS.forEach(p => {
-      if (!parsed.partners[p.key]) parsed.partners[p.key] = emptyPartnerState();
-      const ps = parsed.partners[p.key];
-      ps.records ||= [];
-      ps.customFields ||= [];
-      ps.yearStats ||= {};
-      ps.activeRecordId ||= (ps.records[0]?.id || null);
-
-      // Ensure record schema
-      ps.records.forEach(r => {
-        r.id ||= uid();
-        r.createdAt ||= nowISO();
-        r.updatedAt ||= r.createdAt;
-        r.updatedBy ||= "unknown";
-        r.partnerKey ||= p.key;
-
-        r.rolle ||= "";
-        r.makNummer ??= (p.hasMak ? "" : undefined);
-        r.datum ||= todayISO();
-
-        r.name ||= ""; r.firma ||= ""; r.email ||= "";
-        r.mobil ||= ""; r.telefon ||= "";
-        r.strasse ||= ""; r.plz ||= ""; r.ort ||= ""; r.land ||= "DE";
-
-        r.optin ??= false;
-        r.onlineAbschluss ??= false;
-
-        r.prodVoll ??= ""; r.zielVoll ??= "";
-        r.prodBeihilfe ??= ""; r.zielBeihilfe ??= "";
-        r.prodZusatz ??= ""; r.zielZusatz ??= "";
-        r.prodBkv ??= ""; r.zielBkv ??= "";
-
-        r.freiesFeld ??= "";
-        r.custom ||= {};
-
-        if (!Array.isArray(r.kontakte)) r.kontakte = [];
-        if (!r.kontakte.length){
-          r.kontakte.push({
-            id: uid(),
-            datum: todayISO(),
-            anlass: "",
-            notiz: "",
-            followUpDatum: "",
-            followUpThema: "",
-            followUpErledigt: false,
-            createdAt: nowISO(),
-            updatedAt: nowISO()
-          });
-        }
-      });
-    });
-
-    parsed.activePartnerKey ||= PARTNERS[0].key;
-    parsed.updatedAt ||= nowISO();
-    return parsed;
-  }
-
-  let DB = loadDB();
-
-  function saveDB(){
-    DB.updatedAt = nowISO();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
-  }
-
-  function partnerByKey(key){
-    return PARTNERS.find(p => p.key === key) || PARTNERS[0];
-  }
-
-  function getPartnerState(key){
-    return DB.partners[key];
-  }
-
-  function getActivePartner(){
-    return partnerByKey(DB.activePartnerKey);
-  }
-
-  function getActivePartnerState(){
-    return getPartnerState(DB.activePartnerKey);
-  }
-
-  function getActiveRecord(){
-    const ps = getActivePartnerState();
-    const id = ps.activeRecordId;
-    if (!id) return null;
-    return ps.records.find(r => r.id === id) || null;
-  }
-
-  function touchRecord(r){
-    r.updatedAt = nowISO();
-    r.updatedBy = sessionUserSafe();
-    saveDB();
-  }
-
-  function ensureOneRecord(){
-    const p = getActivePartner();
-    const ps = getActivePartnerState();
-    if (!ps.records.length){
-      const r = baseRecord(p);
-      ps.records.push(r);
-      ps.activeRecordId = r.id;
-      saveDB();
-    }
-    if (!ps.activeRecordId) ps.activeRecordId = ps.records[0].id;
   }
 
   function baseRecord(partner){
@@ -815,107 +735,1116 @@
       updatedBy: sessionUserSafe(),
       partnerKey: partner.key,
 
-      rolle: "",
-      makNummer: partner.hasMak ? "" : undefined,
       datum: todayISO(),
+      rolle: "",
+      partnerNummer: "",
+      makNummer: partner.hasMak ? "" : undefined,
 
-      name:"",
-      firma:"",
-      email:"",
-      mobil:"",
-      telefon:"",
-      strasse:"",
-      plz:"",
-      ort:"",
-      land:"DE",
+      // Stammdaten
+      favorit: false,
+      vorname: "",
+      nachname: "",
+      name: "",          // legacy/Anzeige (wird aus vorname+nachname gesetzt)
+      firma: "",
+      email: "",
+      mobil: "",
+      telefon: "",
+      strasse: "",
+      plz: "",
+      ort: "",
+      land: "DE",
 
-      optin:false,
-      onlineAbschluss:false,
+      optin: false,
+      onlineAbschluss: false,
 
-      prodVoll:"", zielVoll:"",
-      prodBeihilfe:"", zielBeihilfe:"",
-      prodZusatz:"", zielZusatz:"",
-      prodBkv:"", zielBkv:"",
+      // Jahresübersicht (manuell) Ziel/Ist
+      gesamtZiel: "", gesamtIst: "",
+      vollZiel: "", vollIst: "",
+      beihilfeZiel: "", beihilfeIst: "",
+      zusatzZiel: "", zusatzIst: "",
+      pflegeZiel: "", pflegeIst: "",
+      bkvZiel: "", bkvIst: "",
+      reiseZiel: "", reiseIst: "",
 
-      freiesFeld:"",
-      kontakte: [{
-        id: uid(),
-        datum: todayISO(),
-        anlass:"",
-        notiz:"",
-        followUpDatum:"",
-        followUpThema:"",
-        followUpErledigt:false,
-        createdAt: nowISO(),
-        updatedAt: nowISO()
-      }],
-      custom: {}
+      // Kontakte (inkl. Wiedervorlage)
+      kontakte: [
+        { id: uid(), datum: todayISO(), anlass: "", notiz: "", followUpDatum: "", followUpThema: "", followUpErledigt: false, createdAt: nowISO(), updatedAt: nowISO() }
+      ],
+
+      freiesFeld: "",
+
+      custom: {} // custom field values
     };
   }
 
-  // =======================
-  // Address Autofill
-  // =======================
-  function applyAddressAutofillFromFirma(r){
-    const firma = (r.firma || "").trim();
+  function loadDB(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    let db = raw ? safeJSONParse(raw) : null;
+    if (!db || !db.partners) db = emptyDB();
+
+    // Schema ensure
+    PARTNERS.forEach(p => {
+      if (!db.partners[p.key]) db.partners[p.key] = { key:p.key, customFields:[], records:[], activeRecordId:null };
+      const ps = db.partners[p.key];
+      ps.customFields ||= [];
+      ps.records ||= [];
+      if (ps.records.length === 0){
+        const r = baseRecord(p);
+        ps.records.push(r);
+        ps.activeRecordId = r.id;
+      }
+      ps.activeRecordId ||= ps.records[0].id;
+
+      ps.records.forEach(r => {
+        r.custom ||= {};
+        r.updatedAt ||= r.createdAt || nowISO();
+        r.createdAt ||= r.updatedAt || nowISO();
+        r.updatedBy ||= "unknown";
+
+        r.datum ||= todayISO();
+        r.rolle ||= "";
+        r.partnerNummer ||= "";
+        r.makNummer ??= (p.hasMak ? "" : undefined);
+
+        r.vorname ||= "";
+        r.nachname ||= "";
+        r.name ||= "";
+        r.favorit ??= false;
+
+        r.firma ||= "";
+        r.email ||= "";
+
+        r.mobil ||= "";
+        r.telefon ||= "";
+        r.strasse ||= "";
+        r.plz ||= "";
+        r.ort ||= "";
+        r.land ||= "DE";
+
+        r.optin ??= false;
+        r.onlineAbschluss ??= false;
+
+        // yearly fields
+        r.gesamtZiel ??= ""; r.gesamtIst ??= "";
+        r.vollZiel ??= "";   r.vollIst ??= "";
+        r.beihilfeZiel ??= ""; r.beihilfeIst ??= "";
+        r.zusatzZiel ??= ""; r.zusatzIst ??= "";
+        r.pflegeZiel ??= ""; r.pflegeIst ??= "";
+        r.bkvZiel ??= "";    r.bkvIst ??= "";
+        r.reiseZiel ??= "";  r.reiseIst ??= "";
+
+        // Kontakte ensure
+        if (!Array.isArray(r.kontakte)) r.kontakte = [];
+        if (r.kontakte.length === 0){
+          r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
+        }
+        r.kontakte.forEach(k => {
+          k.id ||= uid();
+          k.datum ||= "";
+          k.anlass ||= "";
+          k.notiz ||= "";
+          k.followUpDatum ||= "";
+          k.followUpThema ||= "";
+          k.followUpErledigt ??= false;
+          k.createdAt ||= nowISO();
+          k.updatedAt ||= nowISO();
+        });
+
+        // sync r.name from v/n if present
+        const full = `${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim();
+        if (full) r.name = full;
+      });
+    });
+
+    saveDB(db);
+    return db;
+  }
+
+  function saveDB(db){
+    db.updatedAt = nowISO();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  }
+
+  // global db state
+  let DB = loadDB();
+  let ACTIVE_PARTNER_KEY = PARTNERS[0].key;
+
+  function getActivePartner(){
+    return PARTNERS.find(p => p.key === ACTIVE_PARTNER_KEY) || PARTNERS[0];
+  }
+  function getPartnerState(key){
+    return DB.partners[key];
+  }
+  function getActivePartnerState(){
+    return getPartnerState(ACTIVE_PARTNER_KEY);
+  }
+  function getActiveRecord(){
+    const ps = getActivePartnerState();
+    return ps.records.find(r => r.id === ps.activeRecordId) || ps.records[0];
+  }
+
+  function touch(rec){
+    rec.updatedAt = nowISO();
+    rec.updatedBy = sessionUserSafe();
+    saveDB(DB);
+    $("autosavePill").textContent = "ok";
+    $("autosavePill").className = "pill ok";
+  }
+
+  // ========= Address autofill (Firma -> Adresse) =========
+  const ADDRESS_BOOK = [
+    {
+      match: /fonds\s*finanz.*maklerservice.*gmbh/i,
+      strasse: "Riesstraße 25",
+      plz: "80992",
+      ort: "München",
+      land: "DE"
+    }
+  ];
+
+  function applyAddressAutofillFromFirma(){
+    const firma = ($("firma").value || "").trim();
     if (!firma) return false;
     for (const a of ADDRESS_BOOK){
       if (a.match.test(firma)){
-        if (!r.strasse) r.strasse = a.strasse;
-        if (!r.plz) r.plz = a.plz;
-        if (!r.ort) r.ort = a.ort;
-        if (!r.land) r.land = a.land;
+        if (!$("strasse").value) $("strasse").value = a.strasse;
+        if (!$("plz").value) $("plz").value = a.plz;
+        if (!$("ort").value) $("ort").value = a.ort;
+        if (!$("land").value) $("land").value = a.land;
         return true;
       }
     }
     return false;
   }
 
-  // =======================
-  // Record label (Dropdown)
-  // =======================
-  function recordLabel(partnerKey, r, idx){
-    const role = (r.rolle || "").trim() || "ohne Rolle";
-    const p = partnerByKey(partnerKey);
-    const mak = p.hasMak && r.makNummer ? ` · MAK ${r.makNummer}` : "";
-    return `Reiter ${idx+1} · ${role}${mak}`;
+  // ========= UI: Partner tabs / record select labels =========
+  function recordLabel(p, r, idx){
+    const role = ((r.rolle || "").trim()) || "ohne Rolle";
+    const fn = ((r.vorname||"").trim() + " " + (r.nachname||"").trim()).trim();
+    const namePart = fn ? ` · ${fn}` : "";
+    const fav = r.favorit ? " ★" : "";
+    const mak = p.hasMak && (r.makNummer || "").trim() ? ` · MAK ${r.makNummer.trim()}` : "";
+    return `Reiter ${idx+1}${namePart} · ${role}${mak}${fav}`;
   }
 
-  // =======================
-  // Login UI
-  // =======================
-  function initLoginUI(){
-    $("btnLogin").onclick = () => {
-      const user = ($("loginUser").value || "").trim();
-      const pass = ($("loginPass").value || "");
-      const found = USERS.find(u => u.user === user && u.pass === pass);
-      if (!found){
-        $("loginHint").textContent = "Login fehlgeschlagen";
-        $("loginHint").className = "pill bad";
-        return;
+  function renderPartnerTabs(){
+    const wrap = $("partnerTabs");
+    wrap.innerHTML = "";
+    PARTNERS.forEach(p => {
+      const b = document.createElement("button");
+      b.textContent = p.name;
+      b.className = (p.key === ACTIVE_PARTNER_KEY) ? "active" : "";
+      b.onclick = () => {
+        ACTIVE_PARTNER_KEY = p.key;
+        document.body.setAttribute("data-partner", p.key);
+        renderAll();
+      };
+      wrap.appendChild(b);
+    });
+  }
+
+  function renderRecordSelect(){
+    const p = getActivePartner();
+    const ps = getActivePartnerState();
+    const sel = $("recordSelect");
+    sel.innerHTML = "";
+    ps.records.forEach((r, idx) => {
+      const opt = document.createElement("option");
+      opt.value = r.id;
+      opt.textContent = recordLabel(p, r, idx);
+      if (r.id === ps.activeRecordId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  // ========= Render main form =========
+  function setFieldValue(id, value){
+    const el = $(id);
+    if (!el) return;
+    el.value = value ?? "";
+  }
+
+  function renderForm(){
+    const p = getActivePartner();
+    const r = getActiveRecord();
+
+    // show/hide mak
+    $("makWrap").style.display = p.hasMak ? "" : "none";
+
+    // Top fields
+    setFieldValue("rolle", r.rolle);
+    setFieldValue("partnerNummer", r.partnerNummer);
+    setFieldValue("datum", r.datum || todayISO());
+    if (p.hasMak) setFieldValue("mak", r.makNummer ?? "");
+
+    // Stammdaten
+    setFieldValue("vorname", r.vorname);
+    setFieldValue("nachname", r.nachname);
+    setFieldValue("firma", r.firma);
+    setFieldValue("email", r.email);
+    setFieldValue("mobil", r.mobil);
+    setFieldValue("telefon", r.telefon);
+    setFieldValue("strasse", r.strasse);
+    setFieldValue("plz", r.plz);
+    setFieldValue("ort", r.ort);
+    setFieldValue("land", r.land || "DE");
+
+    $("favorit").checked = !!r.favorit;
+    $("optin").checked = !!r.optin;
+    $("online").checked = !!r.onlineAbschluss;
+
+    // Freies Feld
+    $("freiesFeld").value = r.freiesFeld || "";
+
+    // Kontakte
+    renderContacts();
+
+    // Custom
+    renderCustomFields();
+  }
+
+  function renderContacts(){
+    const r = getActiveRecord();
+    const wrap = $("contactsWrap");
+    wrap.innerHTML = "";
+
+    r.kontakte.forEach((k, idx) => {
+      const box = document.createElement("div");
+      box.className = "card";
+      box.style.padding = "12px";
+      box.style.marginBottom = "10px";
+
+      const head = document.createElement("div");
+      head.style.display = "flex";
+      head.style.justifyContent = "space-between";
+      head.style.alignItems = "center";
+      head.style.gap = "10px";
+      head.innerHTML = `<div style="font-weight:900;">Kontakt ${idx+1}</div>
+                        <div class="pill ${k.followUpDatum && !k.followUpErledigt ? "warn" : ""}">
+                          ${k.followUpDatum && !k.followUpErledigt ? "Wiedervorlage offen" : "—"}
+                        </div>`;
+      box.appendChild(head);
+
+      const row1 = document.createElement("div");
+      row1.className = "row";
+      row1.style.marginTop = "10px";
+      row1.innerHTML = `
+        <div class="field w3"><label>Kontakt-Datum</label><input type="date" data-k="${k.id}" data-f="datum"></div>
+        <div class="field w3"><label>Anlass</label><input data-k="${k.id}" data-f="anlass" placeholder="Anlass"></div>
+        <div class="field w6"><label>Notiz</label><input data-k="${k.id}" data-f="notiz" placeholder="Notiz"></div>
+      `;
+      box.appendChild(row1);
+
+      const row2 = document.createElement("div");
+      row2.className = "row";
+      row2.style.marginTop = "10px";
+      row2.innerHTML = `
+        <div class="field w3"><label>Wiedervorlage-Datum</label><input type="date" data-k="${k.id}" data-f="followUpDatum"></div>
+        <div class="field w6"><label>Thema (Wiedervorlage)</label><input data-k="${k.id}" data-f="followUpThema" placeholder="Thema / Beschreibungsfeld"></div>
+        <div class="field w3"><label>Erledigt</label>
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid rgba(11,27,51,.16); border-radius:14px; background:rgba(255,255,255,.92);">
+            <input type="checkbox" data-k="${k.id}" data-f="followUpErledigt" style="width:auto; transform:scale(1.2);">
+            <span class="muted">Wiedervorlage erledigt</span>
+          </div>
+        </div>
+      `;
+      box.appendChild(row2);
+
+      const row3 = document.createElement("div");
+      row3.className = "row";
+      row3.style.marginTop = "10px";
+      row3.innerHTML = `
+        <button class="danger" data-del-k="${k.id}">Kontakt löschen</button>
+      `;
+      box.appendChild(row3);
+
+      wrap.appendChild(box);
+
+      // fill values after append
+      box.querySelectorAll("input[data-k]").forEach(inp => {
+        const fid = inp.getAttribute("data-f");
+        if (inp.type === "checkbox") inp.checked = !!k[fid];
+        else inp.value = k[fid] || "";
+      });
+
+      // bind
+      box.querySelectorAll("input[data-k]").forEach(inp => {
+        inp.oninput = () => {
+          const rid = inp.getAttribute("data-k");
+          const fid = inp.getAttribute("data-f");
+          const kk = r.kontakte.find(x => x.id === rid);
+          if (!kk) return;
+          if (inp.type === "checkbox") kk[fid] = !!inp.checked;
+          else kk[fid] = inp.value;
+          kk.updatedAt = nowISO();
+          touch(r);
+          renderFollowupsGlobal(); // keep overview fresh
+        };
+        inp.onchange = inp.oninput;
+      });
+
+      // delete contact
+      box.querySelectorAll("button[data-del-k]").forEach(btn => {
+        btn.onclick = () => {
+          if (!confirm("Kontakt wirklich löschen?")) return;
+          r.kontakte = r.kontakte.filter(x => x.id !== btn.getAttribute("data-del-k"));
+          if (r.kontakte.length === 0){
+            r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
+          }
+          touch(r);
+          renderForm();
+          renderFollowupsGlobal();
+        };
+      });
+    });
+  }
+
+  function renderCustomFields(){
+    const ps = getActivePartnerState();
+    const r = getActiveRecord();
+    const wrap = $("customFieldsWrap");
+    wrap.innerHTML = "";
+
+    if (!ps.customFields.length){
+      wrap.innerHTML = `<div class="muted">Keine Zusatzfelder für diesen Partner angelegt.</div>`;
+      return;
+    }
+
+    const row = document.createElement("div");
+    row.className = "row";
+
+    ps.customFields.forEach(cf => {
+      const f = document.createElement("div");
+      f.className = "field w6";
+      f.innerHTML = `<label>${escapeHTML(cf.label)}</label>`;
+      let el;
+
+      const id = "cf_"+cf.id;
+
+      if (cf.type === "checkbox"){
+        const container = document.createElement("div");
+        container.style.display="flex";
+        container.style.alignItems="center";
+        container.style.gap="10px";
+        container.style.padding="10px 12px";
+        container.style.border="1px solid rgba(11,27,51,.16)";
+        container.style.borderRadius="14px";
+        container.style.background="rgba(255,255,255,.92)";
+        container.innerHTML = `<input type="checkbox" id="${id}" style="width:auto; transform:scale(1.2);">
+                               <span class="muted">Ja / Nein</span>`;
+        f.appendChild(container);
+        el = container.querySelector("input");
+        el.checked = !!r.custom[cf.id];
+        el.onchange = () => { r.custom[cf.id] = !!el.checked; touch(r); };
+      } else if (cf.type === "textarea"){
+        el = document.createElement("textarea");
+        el.id = id;
+        el.value = r.custom[cf.id] || "";
+        el.oninput = () => { r.custom[cf.id] = el.value; touch(r); };
+        f.appendChild(el);
+      } else {
+        el = document.createElement("input");
+        el.id = id;
+        el.value = r.custom[cf.id] || "";
+        el.oninput = () => { r.custom[cf.id] = el.value; touch(r); };
+        f.appendChild(el);
       }
-      setSession({ user: found.user, role: found.role, loginAt: nowISO() });
-      $("loginPass").value = "";
-      $("loginHint").textContent = "OK";
-      $("loginHint").className = "pill ok";
+
+      row.appendChild(f);
+    });
+
+    wrap.appendChild(row);
+  }
+
+  function escapeHTML(s){
+    return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ========= Search =========
+  function normalize(s){ return (s||"").toString().toLowerCase().trim(); }
+
+  function buildSearchText(p, r){
+    const parts = [];
+    parts.push(p.name);
+    parts.push(r.rolle, r.partnerNummer, r.makNummer, r.datum);
+    parts.push(r.vorname, r.nachname, r.name, r.firma, r.email, r.mobil, r.telefon, r.strasse, r.plz, r.ort, r.land);
+    parts.push(r.freiesFeld);
+    // contacts
+    if (Array.isArray(r.kontakte)){
+      r.kontakte.forEach(k => {
+        parts.push(k.datum, k.anlass, k.notiz, k.followUpDatum, k.followUpThema, k.followUpErledigt ? "erledigt":"offen");
+      });
+    }
+    // custom
+    const ps = getPartnerState(p.key);
+    ps.customFields.forEach(cf => parts.push(r.custom?.[cf.id]));
+    return normalize(parts.filter(Boolean).join(" | "));
+  }
+
+  function showResults(){
+    const q = normalize($("q").value);
+    const tb = $("resultsTbody");
+    tb.innerHTML = "";
+
+    const hits = [];
+    PARTNERS.forEach(p => {
+      const ps = getPartnerState(p.key);
+      ps.records.forEach((r, idx) => {
+        const txt = buildSearchText(p, r);
+        if (!q || txt.includes(q)){
+          hits.push({ p, r, idx });
+        }
+      });
+    });
+
+    hits.slice(0, 400).forEach(h => {
+      const tr = document.createElement("tr");
+      const nameShown = ((h.r.vorname||"").trim()+" "+(h.r.nachname||"").trim()).trim() || h.r.name || "";
+      tr.innerHTML = `
+        <td>${escapeHTML(h.p.name)}</td>
+        <td><a href="#" data-open="1">${escapeHTML(recordLabel(h.p, h.r, h.idx))}</a></td>
+        <td>${escapeHTML(h.r.rolle||"")}</td>
+        <td>${escapeHTML(h.p.hasMak ? (h.r.makNummer||"") : "")}</td>
+        <td>${escapeHTML(h.r.partnerNummer||"")}</td>
+        <td>${escapeHTML(nameShown)}</td>
+        <td>${escapeHTML(h.r.firma||"")}</td>
+        <td>${escapeHTML(h.r.email||"")}</td>
+        <td>${escapeHTML([h.r.telefon,h.r.mobil].filter(Boolean).join(" / "))}</td>
+        <td>${escapeHTML(h.r.ort||"")}</td>
+      `;
+      tr.querySelector('a[data-open="1"]').onclick = (e) => {
+        e.preventDefault();
+        ACTIVE_PARTNER_KEY = h.p.key;
+        document.body.setAttribute("data-partner", h.p.key);
+        const ps = getPartnerState(h.p.key);
+        ps.activeRecordId = h.r.id;
+        saveDB(DB);
+        $("resultsCard").classList.add("hidden");
+        showPage("main");
+        renderAll();
+      };
+      tb.appendChild(tr);
+    });
+
+    $("resultsCard").classList.remove("hidden");
+  }
+
+  // ========= Global Followups =========
+  function parseDateISO(s){
+    if (!s) return null;
+    const t = Date.parse(s);
+    return Number.isFinite(t) ? t : null;
+  }
+
+  function renderFollowupsGlobal(){
+    const tb = $("followupsTbody");
+    tb.innerHTML = "";
+
+    const items = [];
+    PARTNERS.forEach(p => {
+      const ps = getPartnerState(p.key);
+      ps.records.forEach((r, ridx) => {
+        (r.kontakte || []).forEach((k, kidx) => {
+          if (k.followUpDatum && !k.followUpErledigt){
+            items.push({
+              due: k.followUpDatum,
+              dueT: parseDateISO(k.followUpDatum) || 9e15,
+              partner: p,
+              record: r,
+              ridx,
+              k,
+              kidx
+            });
+          }
+        });
+      });
+    });
+
+    items.sort((a,b) => a.dueT - b.dueT);
+
+    if (!items.length){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="7" class="muted">Keine offenen Wiedervorlagen.</td>`;
+      tb.appendChild(tr);
+      return;
+    }
+
+    items.slice(0, 500).forEach(it => {
+      const nameShown = ((it.record.vorname||"").trim()+" "+(it.record.nachname||"").trim()).trim() || it.record.name || "";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${escapeHTML(it.due)}</b></td>
+        <td>${escapeHTML(it.partner.name)}</td>
+        <td><a href="#" data-open="1">${escapeHTML(recordLabel(it.partner, it.record, it.ridx))}</a></td>
+        <td>Kontakt ${it.kidx+1}${nameShown ? " · "+escapeHTML(nameShown) : ""}</td>
+        <td>${escapeHTML(it.k.anlass||"")}</td>
+        <td>${escapeHTML(it.k.followUpThema||"")}</td>
+        <td>${escapeHTML(it.k.notiz||"")}</td>
+      `;
+      tr.querySelector('a[data-open="1"]').onclick = (e) => {
+        e.preventDefault();
+        ACTIVE_PARTNER_KEY = it.partner.key;
+        document.body.setAttribute("data-partner", it.partner.key);
+        const ps = getPartnerState(it.partner.key);
+        ps.activeRecordId = it.record.id;
+        saveDB(DB);
+        showPage("main");
+        renderAll();
+      };
+      tb.appendChild(tr);
+    });
+  }
+
+  // ========= Year / Month stats =========
+  function moneyParse(v){
+    if (v === null || v === undefined) return 0;
+    const s = String(v).replace(/\./g,"").replace(",",".").replace(/[^\d.-]/g,"").trim();
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : 0;
+  }
+  function moneyFmt(n){
+    const x = Math.round((n||0) * 100) / 100;
+    return x.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  }
+
+  function yearsAvailable(){
+    const years = new Set();
+    PARTNERS.forEach(p=>{
+      getPartnerState(p.key).records.forEach(r=>{
+        const y = (r.datum||"").slice(0,4);
+        if (y && /^\d{4}$/.test(y)) years.add(parseInt(y,10));
+      });
+    });
+    const yNow = new Date().getFullYear();
+    years.add(yNow);
+    return Array.from(years).sort((a,b)=>b-a);
+  }
+
+  function renderYearSelect(){
+    const ys = yearsAvailable();
+    const sel = $("yearSelect");
+    sel.innerHTML = "";
+    ys.forEach(y=>{
+      const opt = document.createElement("option");
+      opt.value = String(y);
+      opt.textContent = String(y);
+      sel.appendChild(opt);
+    });
+    sel.value = String(new Date().getFullYear());
+  }
+
+  function renderStatsPartnerSelect(){
+    const sel = $("statsPartner");
+    sel.innerHTML = "";
+    PARTNERS.forEach(p=>{
+      const opt = document.createElement("option");
+      opt.value = p.key;
+      opt.textContent = p.name;
+      sel.appendChild(opt);
+    });
+    sel.value = ACTIVE_PARTNER_KEY;
+  }
+
+  function renderYearTable(){
+    const y = parseInt($("yearSelect").value,10) || new Date().getFullYear();
+    const tb = $("yearTableTbody");
+    tb.innerHTML = "";
+
+    const rows = [];
+    PARTNERS.forEach(p=>{
+      const ps = getPartnerState(p.key);
+      ps.records.forEach((r, idx)=>{
+        const ry = parseInt((r.datum||"").slice(0,4),10);
+        if (ry !== y) return;
+        rows.push({p,r,idx});
+      });
+    });
+
+    if (!rows.length){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="16" class="muted">Keine Datensätze im Jahr ${y}.</td>`;
+      tb.appendChild(tr);
+      return;
+    }
+
+    rows.forEach(x=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escapeHTML(x.p.name)}</td>
+        <td>${escapeHTML(recordLabel(x.p, x.r, x.idx))}</td>
+        <td>${escapeHTML(x.r.gesamtZiel||"")}</td>
+        <td>${escapeHTML(x.r.gesamtIst||"")}</td>
+        <td>${escapeHTML(x.r.vollZiel||"")}</td>
+        <td>${escapeHTML(x.r.vollIst||"")}</td>
+        <td>${escapeHTML(x.r.beihilfeZiel||"")}</td>
+        <td>${escapeHTML(x.r.beihilfeIst||"")}</td>
+        <td>${escapeHTML(x.r.zusatzZiel||"")}</td>
+        <td>${escapeHTML(x.r.zusatzIst||"")}</td>
+        <td>${escapeHTML(x.r.pflegeZiel||"")}</td>
+        <td>${escapeHTML(x.r.pflegeIst||"")}</td>
+        <td>${escapeHTML(x.r.bkvZiel||"")}</td>
+        <td>${escapeHTML(x.r.bkvIst||"")}</td>
+        <td>${escapeHTML(x.r.reiseZiel||"")}</td>
+        <td>${escapeHTML(x.r.reiseIst||"")}</td>
+      `;
+      tb.appendChild(tr);
+    });
+  }
+
+  function monthlyBucketsForPartner(partnerKey, year){
+    const ps = getPartnerState(partnerKey);
+    const buckets = Array.from({length:12}, ()=>({
+      vollIst:0, vollZiel:0,
+      beihilfeIst:0, beihilfeZiel:0,
+      zusatzIst:0, zusatzZiel:0,
+      pflegeIst:0, pflegeZiel:0,
+      bkvIst:0, bkvZiel:0,
+      reiseIst:0, reiseZiel:0,
+      gesamtIst:0, gesamtZiel:0,
+    }));
+
+    ps.records.forEach(r=>{
+      const ry = parseInt((r.datum||"").slice(0,4),10);
+      if (ry !== year) return;
+
+      // distribute yearly values equally to 12 months
+      const add = (k, v) => v/12;
+
+      const v = {
+        vollIst: moneyParse(r.vollIst),
+        vollZiel: moneyParse(r.vollZiel),
+        beihilfeIst: moneyParse(r.beihilfeIst),
+        beihilfeZiel: moneyParse(r.beihilfeZiel),
+        zusatzIst: moneyParse(r.zusatzIst),
+        zusatzZiel: moneyParse(r.zusatzZiel),
+        pflegeIst: moneyParse(r.pflegeIst),
+        pflegeZiel: moneyParse(r.pflegeZiel),
+        bkvIst: moneyParse(r.bkvIst),
+        bkvZiel: moneyParse(r.bkvZiel),
+        reiseIst: moneyParse(r.reiseIst),
+        reiseZiel: moneyParse(r.reiseZiel),
+        gesamtIst: moneyParse(r.gesamtIst),
+        gesamtZiel: moneyParse(r.gesamtZiel),
+      };
+
+      for (let m=0;m<12;m++){
+        const b = buckets[m];
+        Object.keys(v).forEach(k=> b[k] += add(k, v[k]));
+      }
+    });
+
+    return buckets;
+  }
+
+  function renderMonthTable(){
+    const year = parseInt($("yearSelect").value,10) || new Date().getFullYear();
+    const partnerKey = $("statsPartner").value || ACTIVE_PARTNER_KEY;
+    const buckets = monthlyBucketsForPartner(partnerKey, year);
+
+    const tb = $("monthTableTbody");
+    tb.innerHTML = "";
+    buckets.forEach((b,i)=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${MONTHS[i]}</b></td>
+        <td>${moneyFmt(b.vollIst)}</td>
+        <td>${moneyFmt(b.vollZiel)}</td>
+        <td>${moneyFmt(b.beihilfeIst)}</td>
+        <td>${moneyFmt(b.beihilfeZiel)}</td>
+        <td>${moneyFmt(b.zusatzIst)}</td>
+        <td>${moneyFmt(b.zusatzZiel)}</td>
+        <td>${moneyFmt(b.pflegeIst)}</td>
+        <td>${moneyFmt(b.pflegeZiel)}</td>
+        <td>${moneyFmt(b.bkvIst)}</td>
+        <td>${moneyFmt(b.bkvZiel)}</td>
+        <td>${moneyFmt(b.reiseIst)}</td>
+        <td>${moneyFmt(b.reiseZiel)}</td>
+        <td>${moneyFmt(b.gesamtIst)}</td>
+        <td>${moneyFmt(b.gesamtZiel)}</td>
+      `;
+      tb.appendChild(tr);
+    });
+  }
+
+  // ========= Bind inputs (main form) =========
+  function bindMainInputs(){
+    // top fields
+    $("rolle").oninput = () => { const r=getActiveRecord(); r.rolle=$("rolle").value; touch(r); renderRecordSelect(); };
+    $("partnerNummer").oninput = () => { const r=getActiveRecord(); r.partnerNummer=$("partnerNummer").value; touch(r); };
+    $("datum").onchange = () => { const r=getActiveRecord(); r.datum=$("datum").value; touch(r); renderRecordSelect(); renderFollowupsGlobal(); renderYearTable(); renderMonthTable(); };
+    $("mak").oninput = () => { const r=getActiveRecord(); r.makNummer=$("mak").value; touch(r); renderRecordSelect(); };
+
+    // stammdaten
+    $("vorname").oninput = () => {
+      const r=getActiveRecord();
+      r.vorname = $("vorname").value;
+      r.name = `${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim();
+      touch(r);
+      renderRecordSelect();
+    };
+    $("nachname").oninput = () => {
+      const r=getActiveRecord();
+      r.nachname = $("nachname").value;
+      r.name = `${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim();
+      touch(r);
+      renderRecordSelect();
     };
 
-    $("btnClearLocal").onclick = () => {
-      if (!confirm("Wirklich ALLE lokalen Daten (inkl. Datensätze) löschen?")) return;
-      localStorage.removeItem(STORAGE_KEY);
-      DB = defaultDB();
-      saveDB();
-      renderAll();
-      alert("Lokale Daten gelöscht.");
+    $("firma").oninput = () => {
+      const r=getActiveRecord();
+      r.firma = $("firma").value;
+      const filled = applyAddressAutofillFromFirma();
+      r.strasse = $("strasse").value;
+      r.plz = $("plz").value;
+      r.ort = $("ort").value;
+      r.land = $("land").value || "DE";
+      touch(r);
+      if (filled) renderForm();
+    };
+
+    $("email").oninput = () => { const r=getActiveRecord(); r.email=$("email").value; touch(r); };
+    $("mobil").oninput = () => { const r=getActiveRecord(); r.mobil=$("mobil").value; touch(r); };
+    $("telefon").oninput = () => { const r=getActiveRecord(); r.telefon=$("telefon").value; touch(r); };
+
+    $("strasse").oninput = () => { const r=getActiveRecord(); r.strasse=$("strasse").value; touch(r); };
+    $("plz").oninput = () => { const r=getActiveRecord(); r.plz=$("plz").value; touch(r); };
+    $("ort").oninput = () => { const r=getActiveRecord(); r.ort=$("ort").value; touch(r); };
+    $("land").oninput = () => { const r=getActiveRecord(); r.land=$("land").value; touch(r); };
+
+    $("favorit").onchange = () => { const r=getActiveRecord(); r.favorit=!!$("favorit").checked; touch(r); renderRecordSelect(); };
+    $("optin").onchange = () => { const r=getActiveRecord(); r.optin=!!$("optin").checked; touch(r); };
+    $("online").onchange = () => { const r=getActiveRecord(); r.onlineAbschluss=!!$("online").checked; touch(r); };
+
+    $("freiesFeld").oninput = () => { const r=getActiveRecord(); r.freiesFeld=$("freiesFeld").value; touch(r); };
+
+    // buttons
+    $("btnAddContact").onclick = () => {
+      const r=getActiveRecord();
+      r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
+      touch(r);
+      renderContacts();
+      renderFollowupsGlobal();
+    };
+
+    // copy/call/mail
+    $("btnCopyAddress").onclick = async () => {
+      const r=getActiveRecord();
+      const txt = [r.firma, r.strasse, `${r.plz} ${r.ort}`.trim(), r.land].filter(Boolean).join("\n");
+      await copyToClipboard(txt);
+      toast("Adresse kopiert");
+    };
+    $("btnCopyPhone").onclick = async () => {
+      const r=getActiveRecord();
+      const txt = [r.telefon, r.mobil].filter(Boolean).join(" / ");
+      await copyToClipboard(txt);
+      toast("Tel/Mobil kopiert");
+    };
+    $("btnCall").onclick = () => {
+      const r=getActiveRecord();
+      const num = (r.telefon || r.mobil || "").replace(/\s+/g,"");
+      if (!num) return toast("Keine Nummer vorhanden", "warn");
+      window.location.href = "tel:"+num;
+    };
+    $("btnMail").onclick = () => {
+      const r=getActiveRecord();
+      if (!r.email) return toast("Keine E-Mail vorhanden", "warn");
+      window.location.href = "mailto:"+encodeURIComponent(r.email);
     };
   }
 
-  // =======================
-  // Bindings
-  // =======================
+  async function copyToClipboard(text){
+    try{
+      await navigator.clipboard.writeText(text || "");
+    }catch(e){
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text || "";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+  }
+
+  function toast(msg, kind="ok"){
+    setStatus(msg, kind==="ok"?"ok":kind==="warn"?"warn":"bad");
+    setTimeout(()=>setStatus("bereit",""), 1800);
+  }
+
+  // ========= Records CRUD =========
+  function addRecord(){
+    const p = getActivePartner();
+    const ps = getActivePartnerState();
+    const r = baseRecord(p);
+    ps.records.push(r);
+    ps.activeRecordId = r.id;
+    saveDB(DB);
+    renderAll();
+  }
+
+  function deleteRecord(){
+    const ps = getActivePartnerState();
+    if (ps.records.length <= 1){
+      alert("Mindestens ein Reiter muss bestehen bleiben.");
+      return;
+    }
+    const r = getActiveRecord();
+    if (!confirm("Reiter wirklich löschen?")) return;
+    ps.records = ps.records.filter(x => x.id !== r.id);
+    ps.activeRecordId = ps.records[0].id;
+    saveDB(DB);
+    renderAll();
+  }
+
+  // ========= Custom fields CRUD =========
+  function addCustomField(){
+    const ps = getActivePartnerState();
+    const label = prompt("Feldname (Label):");
+    if (!label) return;
+    const type = prompt('Typ: "text" | "textarea" | "checkbox"', "text");
+    const t = (type||"text").toLowerCase().trim();
+    const allowed = ["text","textarea","checkbox"];
+    const finalType = allowed.includes(t) ? t : "text";
+    ps.customFields.push({ id: uid(), label: label.trim(), type: finalType });
+    saveDB(DB);
+    renderAll();
+  }
+
+  function deleteCustomField(){
+    const ps = getActivePartnerState();
+    if (!ps.customFields.length){
+      alert("Keine Zusatzfelder vorhanden.");
+      return;
+    }
+    const names = ps.customFields.map((c,i)=>`${i+1}: ${c.label} (${c.type})`).join("\n");
+    const pick = prompt("Welche Nummer löschen?\n"+names, "1");
+    const n = parseInt(pick,10);
+    if (!Number.isFinite(n) || n<1 || n>ps.customFields.length) return;
+    const cf = ps.customFields[n-1];
+    if (!confirm(`Feld "${cf.label}" wirklich löschen? Werte in Datensätzen gehen verloren.`)) return;
+
+    ps.customFields = ps.customFields.filter(x => x.id !== cf.id);
+    // remove values
+    ps.records.forEach(r => {
+      if (r.custom && cf.id in r.custom) delete r.custom[cf.id];
+    });
+    saveDB(DB);
+    renderAll();
+  }
+
+  // ========= Export / Import / Merge =========
+  function downloadBlob(filename, blob){
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  function exportFull(){
+    const data = JSON.stringify(DB, null, 2);
+    const blob = new Blob([data], {type:"application/json"});
+    downloadBlob("vertriebspartner_backup_full.json", blob);
+  }
+
+  function exportDelta(){
+    const day = todayISO();
+    const delta = { version: DB.version, exportedAt: nowISO(), kind:"delta", partners:{} };
+
+    PARTNERS.forEach(p=>{
+      const ps = getPartnerState(p.key);
+      const recs = ps.records.filter(r => (r.updatedAt||"").slice(0,10) === day);
+      if (recs.length){
+        delta.partners[p.key] = {
+          key: p.key,
+          customFields: ps.customFields,
+          records: recs,
+          activeRecordId: ps.activeRecordId
+        };
+      }
+    });
+
+    const blob = new Blob([JSON.stringify(delta, null, 2)], {type:"application/json"});
+    downloadBlob(`vertriebspartner_delta_${day}.json`, blob);
+  }
+
+  function exportCSV(){
+    const rows = [];
+    const header = [
+      "partner","reiter","datum","rolle","partnerNummer","mak",
+      "favorit","vorname","nachname","firma","email","mobil","telefon",
+      "strasse","plz","ort","land",
+      "optin","onlineAbschluss",
+      "gesamtZiel","gesamtIst",
+      "vollZiel","vollIst",
+      "beihilfeZiel","beihilfeIst",
+      "zusatzZiel","zusatzIst",
+      "pflegeZiel","pflegeIst",
+      "bkvZiel","bkvIst",
+      "reiseZiel","reiseIst",
+      "kontakte_count","naechste_wiedervorlage"
+    ];
+    rows.push(header);
+
+    PARTNERS.forEach(p=>{
+      const ps = getPartnerState(p.key);
+      ps.records.forEach((r, idx)=>{
+        const next = (r.kontakte||[])
+          .filter(k=>k.followUpDatum && !k.followUpErledigt)
+          .map(k=>k.followUpDatum)
+          .sort()[0] || "";
+        const line = [
+          p.name,
+          recordLabel(p,r,idx),
+          r.datum||"",
+          r.rolle||"",
+          r.partnerNummer||"",
+          p.hasMak ? (r.makNummer||"") : "",
+          r.favorit ? "Ja":"Nein",
+          r.vorname||"",
+          r.nachname||"",
+          r.firma||"",
+          r.email||"",
+          r.mobil||"",
+          r.telefon||"",
+          r.strasse||"",
+          r.plz||"",
+          r.ort||"",
+          r.land||"",
+          r.optin ? "Ja":"Nein",
+          r.onlineAbschluss ? "Ja":"Nein",
+          r.gesamtZiel||"", r.gesamtIst||"",
+          r.vollZiel||"", r.vollIst||"",
+          r.beihilfeZiel||"", r.beihilfeIst||"",
+          r.zusatzZiel||"", r.zusatzIst||"",
+          r.pflegeZiel||"", r.pflegeIst||"",
+          r.bkvZiel||"", r.bkvIst||"",
+          r.reiseZiel||"", r.reiseIst||"",
+          String((r.kontakte||[]).length),
+          next
+        ];
+        rows.push(line);
+      });
+    });
+
+    const csv = rows.map(r=>r.map(csvCell).join(";")).join("\n");
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    downloadBlob("vertriebspartner_export.csv", blob);
+  }
+
+  function csvCell(v){
+    const s = (v===null||v===undefined) ? "" : String(v);
+    if (/[;"\n\r]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+    return s;
+  }
+
+  async function importFiles(fileList){
+    if (!fileList || !fileList.length) return;
+
+    const files = Array.from(fileList);
+    for (const f of files){
+      const text = await f.text();
+      const incoming = safeJSONParse(text);
+      if (!incoming) { alert(`Ungültiges JSON: ${f.name}`); continue; }
+      mergeDB(incoming);
+    }
+    saveDB(DB);
+    toast("Import / Merge erledigt", "ok");
+    renderAll();
+  }
+
+  function mergeDB(incoming){
+    // Accept either full DB or delta with partners subset
+    const incPartners = incoming.partners || {};
+    PARTNERS.forEach(p=>{
+      const inc = incPartners[p.key];
+      if (!inc) return;
+
+      const ps = getPartnerState(p.key);
+
+      // custom fields: merge by id; append missing
+      const byId = new Map(ps.customFields.map(c=>[c.id,c]));
+      (inc.customFields || []).forEach(c=>{
+        if (!byId.has(c.id)) { ps.customFields.push(c); byId.set(c.id,c); }
+      });
+
+      // records: merge by id, choose newer updatedAt
+      const localById = new Map(ps.records.map(r=>[r.id,r]));
+      (inc.records || []).forEach(rIn=>{
+        const rLocal = localById.get(rIn.id);
+        if (!rLocal){
+          ps.records.push(rIn);
+          localById.set(rIn.id, rIn);
+        } else {
+          const tL = Date.parse(rLocal.updatedAt||"") || 0;
+          const tI = Date.parse(rIn.updatedAt||"") || 0;
+          if (tI >= tL){
+            // overwrite local with incoming
+            Object.assign(rLocal, rIn);
+          }
+        }
+      });
+
+      // active record: keep local
+      ps.activeRecordId ||= (ps.records[0] && ps.records[0].id);
+    });
+
+    // ensure schema after merge
+    DB = loadDB();
+  }
+
+  // ========= Stats CSV export =========
+  function exportStatsCSV(){
+    const y = parseInt($("yearSelect").value,10) || new Date().getFullYear();
+    const lines = [];
+    lines.push(["typ","jahr","partner","monat","vollIst","vollZiel","beihilfeIst","beihilfeZiel","zusatzIst","zusatzZiel","pflegeIst","pflegeZiel","bkvIst","bkvZiel","reiseIst","reiseZiel","gesamtIst","gesamtZiel"].join(";"));
+
+    PARTNERS.forEach(p=>{
+      const buckets = monthlyBucketsForPartner(p.key, y);
+      buckets.forEach((b,i)=>{
+        lines.push([
+          "monat", y, p.name, MONTHS[i],
+          moneyFmt(b.vollIst), moneyFmt(b.vollZiel),
+          moneyFmt(b.beihilfeIst), moneyFmt(b.beihilfeZiel),
+          moneyFmt(b.zusatzIst), moneyFmt(b.zusatzZiel),
+          moneyFmt(b.pflegeIst), moneyFmt(b.pflegeZiel),
+          moneyFmt(b.bkvIst), moneyFmt(b.bkvZiel),
+          moneyFmt(b.reiseIst), moneyFmt(b.reiseZiel),
+          moneyFmt(b.gesamtIst), moneyFmt(b.gesamtZiel)
+        ].map(csvCell).join(";"));
+      });
+    });
+
+    const blob = new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8"});
+    downloadBlob(`auswertung_${y}.csv`, blob);
+  }
+
+  // ========= Pages =========
+  function showPage(which){
+    const main = $("mainCard");
+    const stats = $("statsCard");
+
+    if (which === "stats"){
+      $("tabMain").classList.remove("active");
+      $("tabStats").classList.add("active");
+      main.classList.add("hidden");
+      stats.classList.remove("hidden");
+      renderFollowupsGlobal();
+      renderYearTable();
+      renderMonthTable();
+    } else {
+      $("tabStats").classList.remove("active");
+      $("tabMain").classList.add("active");
+      stats.classList.add("hidden");
+      main.classList.remove("hidden");
+    }
+  }
+
+  // ========= Bind global actions =========
   function bindAllInputs(){
     $("btnPrint").onclick = () => window.print();
-
     $("btnLogout").onclick = () => setSession(null);
 
     $("btnNewTab").onclick = () => addRecord();
@@ -924,7 +1853,7 @@
     $("recordSelect").onchange = (e) => {
       const ps = getActivePartnerState();
       ps.activeRecordId = e.target.value;
-      saveDB();
+      saveDB(DB);
       renderAll();
     };
 
@@ -942,996 +1871,57 @@
     };
 
     $("btnFind").onclick = () => showResults();
-    $("btnCloseResults").onclick = () => { $("resultsWrap").style.display = "none"; };
+    $("btnCloseResults").onclick = () => $("resultsCard").classList.add("hidden");
+    $("btnCloseResults2").onclick = () => $("resultsCard").classList.add("hidden");
 
     $("tabMain").onclick = () => showPage("main");
     $("tabStats").onclick = () => showPage("stats");
 
+    $("yearSelect").onchange = () => { renderYearTable(); renderMonthTable(); };
+    $("statsPartner").onchange = () => renderMonthTable();
+    $("btnStatsCSV").onclick = () => exportStatsCSV();
     $("btnStatsPrint").onclick = () => window.print();
-    $("btnStatsCsv").onclick = () => exportStatsCSV();
   }
 
-  // =======================
-  // Pages
-  // =======================
-  let ACTIVE_PAGE = "main";
-  function showPage(which){
-    ACTIVE_PAGE = which;
-    renderAll();
-  }
-
-  // =======================
-  // Partner tabs
-  // =======================
-  function renderPartnerTabs(){
-    const host = $("partnerTabs");
-    host.innerHTML = "";
-    PARTNERS.forEach(p => {
-      const btn = document.createElement("button");
-      btn.className = "partnerChip" + (p.key === DB.activePartnerKey ? " active" : "");
-      btn.textContent = p.name;
-      btn.onclick = () => {
-        DB.activePartnerKey = p.key;
-        document.body.setAttribute("data-partner", p.key);
-        ensureOneRecord();
-        saveDB();
-        renderAll();
-      };
-      host.appendChild(btn);
-    });
-
-    document.body.setAttribute("data-partner", DB.activePartnerKey);
-  }
-
-  // =======================
-  // Record dropdown
-  // =======================
-  function renderRecordSelect(){
-    const ps = getActivePartnerState();
-    const sel = $("recordSelect");
-    sel.innerHTML = "";
-    ps.records.forEach((r, idx) => {
-      const opt = document.createElement("option");
-      opt.value = r.id;
-      opt.textContent = recordLabel(DB.activePartnerKey, r, idx);
-      sel.appendChild(opt);
-    });
-    if (ps.activeRecordId) sel.value = ps.activeRecordId;
-  }
-
-  // =======================
-  // Form render + autosave
-  // =======================
-  function setField(id, value){
-    const el = $(id);
-    if (!el) return;
-    if (el.type === "checkbox") el.checked = !!value;
-    else el.value = value ?? "";
-  }
-
-  function getFieldValue(el){
-    if (!el) return "";
-    if (el.type === "checkbox") return !!el.checked;
-    return el.value;
-  }
-
-  function renderForm(){
-    const p = getActivePartner();
-    const r = getActiveRecord();
-    if (!r) return;
-
-    $("makWrap").style.display = p.hasMak ? "" : "none";
-
-    setField("rolle", r.rolle);
-    setField("mak", p.hasMak ? (r.makNummer || "") : "");
-    setField("datum", r.datum || todayISO());
-
-    setField("name", r.name);
-    setField("firma", r.firma);
-    setField("email", r.email);
-
-    setField("mobil", r.mobil);
-    setField("telefon", r.telefon);
-
-    setField("strasse", r.strasse);
-    setField("plz", r.plz);
-    setField("ort", r.ort);
-    setField("land", r.land);
-
-    $("optin").value = String(!!r.optin);
-    $("online").value = String(!!r.onlineAbschluss);
-
-    setField("prodVoll", r.prodVoll);
-    setField("zielVoll", r.zielVoll);
-    setField("prodBeihilfe", r.prodBeihilfe);
-    setField("zielBeihilfe", r.zielBeihilfe);
-    setField("prodZusatz", r.prodZusatz);
-    setField("zielZusatz", r.zielZusatz);
-    setField("prodBkv", r.prodBkv);
-    setField("zielBkv", r.zielBkv);
-
-    setField("freiesFeld", r.freiesFeld);
-
-    // Copy actions
-    $("btnCopyAddr").onclick = async () => {
-      const addr = [r.firma, r.strasse, (r.plz ? (r.plz + " ") : "") + r.ort, r.land].filter(Boolean).join("\n");
-      await navigator.clipboard.writeText(addr);
-      setStatus("Adresse kopiert", "ok");
-      setTimeout(()=>setStatus("bereit",""), 900);
-    };
-    $("btnCopyPhone").onclick = async () => {
-      const txt = ["Mobil: " + (r.mobil||""), "Telefon: " + (r.telefon||"")].join("\n");
-      await navigator.clipboard.writeText(txt);
-      setStatus("Telefon kopiert", "ok");
-      setTimeout(()=>setStatus("bereit",""), 900);
-    };
-    $("btnMail").onclick = () => {
-      const email = (r.email || "").trim();
-      if (!email) return alert("Keine E-Mail eingetragen.");
-      window.location.href = `mailto:${encodeURIComponent(email)}`;
-    };
-    $("btnCall").onclick = () => {
-      const tel = (r.mobil || r.telefon || "").trim();
-      if (!tel) return alert("Keine Telefonnummer eingetragen.");
-      window.location.href = `tel:${encodeURIComponent(tel)}`;
-    };
-
-    // Wire autosave
-    const wire = (id, setter) => {
-      const el = $(id);
-      if (!el) return;
-      el.oninput = () => {
-        setter(getFieldValue(el));
-        touchRecord(r);
-        if (id === "firma"){
-          const filled = applyAddressAutofillFromFirma(r);
-          touchRecord(r);
-          if (filled) renderForm(); // refresh address fields
-        }
-        renderStats(); // keep stats in sync
-      };
-      el.onchange = el.oninput;
-    };
-
-    wire("rolle", v => r.rolle = v);
-    if (p.hasMak) wire("mak", v => r.makNummer = v);
-    wire("datum", v => r.datum = v);
-
-    wire("name", v => r.name = v);
-    wire("firma", v => r.firma = v);
-    wire("email", v => r.email = v);
-
-    wire("mobil", v => r.mobil = v);
-    wire("telefon", v => r.telefon = v);
-
-    wire("strasse", v => r.strasse = v);
-    wire("plz", v => r.plz = v);
-    wire("ort", v => r.ort = v);
-    wire("land", v => r.land = v);
-
-    $("optin").onchange = () => { r.optin = ($("optin").value === "true"); touchRecord(r); renderStats(); };
-    $("online").onchange = () => { r.onlineAbschluss = ($("online").value === "true"); touchRecord(r); };
-
-    wire("prodVoll", v => r.prodVoll = v);
-    wire("zielVoll", v => r.zielVoll = v);
-    wire("prodBeihilfe", v => r.prodBeihilfe = v);
-    wire("zielBeihilfe", v => r.zielBeihilfe = v);
-    wire("prodZusatz", v => r.prodZusatz = v);
-    wire("zielZusatz", v => r.zielZusatz = v);
-    wire("prodBkv", v => r.prodBkv = v);
-    wire("zielBkv", v => r.zielBkv = v);
-
-    wire("freiesFeld", v => r.freiesFeld = v);
-
-    renderKontakte();
-    renderCustomFields();
-  }
-
-  // =======================
-  // Kontakte + Wiedervorlage
-  // =======================
-  function renderKontakte(){
-    const r = getActiveRecord();
-    if (!r) return;
-
-    const host = $("kontakteHost");
-    host.innerHTML = "";
-
-    r.kontakte.forEach((k, idx) => {
-      const row = document.createElement("div");
-      row.className = "card";
-      row.style.boxShadow = "none";
-      row.style.background = "rgba(255,255,255,.72)";
-      row.style.marginTop = "10px";
-      row.style.borderRadius = "16px";
-      row.style.padding = "14px";
-
-      row.innerHTML = `
-        <div class="kpiRow" style="justify-content:space-between;">
-          <div><b>Kontakt ${idx+1}</b> <span class="muted">(${escapeHtml(k.datum || "")})</span></div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="ghost" data-act="addFollowUp">Wiedervorlage setzen</button>
-            <button class="ghost" data-act="toggleDone">${k.followUpErledigt ? "Wiedervorlage öffnen" : "Wiedervorlage erledigt"}</button>
-            <button class="danger" data-act="delKontakt">Kontakt löschen</button>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px;">
-          <div class="field w3">
-            <label>Kontakt-Datum</label>
-            <input type="date" data-k="datum" value="${escapeHtml(k.datum || todayISO())}">
-          </div>
-          <div class="field w9">
-            <label>Anlass</label>
-            <input data-k="anlass" value="${escapeHtml(k.anlass || "")}" placeholder="z. B. Abstimmung / Termin / Anfrage …">
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px;">
-          <div class="field w12">
-            <label>Notiz</label>
-            <textarea data-k="notiz" placeholder="Gesprächsnotiz …">${escapeHtml(k.notiz || "")}</textarea>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="row">
-          <div class="field w3">
-            <label>Wiedervorlage Datum</label>
-            <input type="date" data-k="followUpDatum" value="${escapeHtml(k.followUpDatum || "")}">
-          </div>
-          <div class="field w7">
-            <label>Wiedervorlage Thema</label>
-            <input data-k="followUpThema" value="${escapeHtml(k.followUpThema || "")}" placeholder="Worum geht’s?">
-          </div>
-          <div class="field w2">
-            <label>Erledigt</label>
-            <select data-k="followUpErledigt">
-              <option value="false"${k.followUpErledigt ? "" : " selected"}>offen</option>
-              <option value="true"${k.followUpErledigt ? " selected" : ""}>erledigt</option>
-            </select>
-          </div>
-        </div>
-      `;
-
-      row.querySelectorAll("[data-k]").forEach(el => {
-        const key = el.getAttribute("data-k");
-        el.oninput = () => {
-          if (key === "followUpErledigt"){
-            k.followUpErledigt = (el.value === "true");
-          } else {
-            k[key] = el.value;
-          }
-          k.updatedAt = nowISO();
-          touchRecord(r);
-          renderStats();
-          renderFollowUpOverviewAllPartners();
-        };
-        el.onchange = el.oninput;
-      });
-
-      row.querySelectorAll("button[data-act]").forEach(btn => {
-        btn.onclick = () => {
-          const act = btn.getAttribute("data-act");
-          if (act === "delKontakt"){
-            if (!confirm("Kontakt wirklich löschen?")) return;
-            r.kontakte.splice(idx, 1);
-            if (!r.kontakte.length){
-              r.kontakte.push({
-                id: uid(), datum: todayISO(), anlass:"", notiz:"",
-                followUpDatum:"", followUpThema:"", followUpErledigt:false,
-                createdAt: nowISO(), updatedAt: nowISO()
-              });
-            }
-            touchRecord(r);
-            renderKontakte();
-            renderStats();
-            renderFollowUpOverviewAllPartners();
-          }
-          if (act === "toggleDone"){
-            k.followUpErledigt = !k.followUpErledigt;
-            k.updatedAt = nowISO();
-            touchRecord(r);
-            renderKontakte();
-            renderStats();
-            renderFollowUpOverviewAllPartners();
-          }
-          if (act === "addFollowUp"){
-            if (!k.followUpDatum) k.followUpDatum = todayISO();
-            if (!k.followUpThema) k.followUpThema = "Wiedervorlage";
-            k.followUpErledigt = false;
-            k.updatedAt = nowISO();
-            touchRecord(r);
-            renderKontakte();
-            renderStats();
-            renderFollowUpOverviewAllPartners();
-          }
-        };
-      });
-
-      host.appendChild(row);
-    });
-
-    $("btnAddKontakt").onclick = () => {
-      r.kontakte.push({
-        id: uid(),
-        datum: todayISO(),
-        anlass:"",
-        notiz:"",
-        followUpDatum:"",
-        followUpThema:"",
-        followUpErledigt:false,
-        createdAt: nowISO(),
-        updatedAt: nowISO()
-      });
-      touchRecord(r);
-      renderKontakte();
-      renderFollowUpOverviewAllPartners();
-    };
-
-    $("btnMarkAllDone").onclick = () => {
-      r.kontakte.forEach(k => k.followUpErledigt = true);
-      touchRecord(r);
-      renderKontakte();
-      renderFollowUpOverviewAllPartners();
-    };
-  }
-
-  // =======================
-  // Custom fields
-  // =======================
-  function renderCustomFields(){
-    const ps = getActivePartnerState();
-    const r = getActiveRecord();
-    const host = $("customFieldsHost");
-    host.innerHTML = "";
-
-    if (!ps.customFields.length) return;
-
-    const h = document.createElement("div");
-    h.className = "divider";
-    host.appendChild(h);
-
-    const title = document.createElement("div");
-    title.className = "h";
-    title.textContent = "Zusatzfelder (Custom)";
-    host.appendChild(title);
-
-    ps.customFields.forEach(cf => {
-      const wrap = document.createElement("div");
-      wrap.className = "row";
-      wrap.style.marginTop = "10px";
-
-      const field = document.createElement("div");
-      field.className = "field w12";
-
-      const lab = document.createElement("label");
-      lab.textContent = cf.label;
-      field.appendChild(lab);
-
-      let el;
-      if (cf.type === "textarea"){
-        el = document.createElement("textarea");
-        el.value = r.custom[cf.id] ?? "";
-      } else if (cf.type === "checkbox"){
-        el = document.createElement("select");
-        el.innerHTML = `<option value="false">Nein</option><option value="true">Ja</option>`;
-        el.value = String(!!r.custom[cf.id]);
-      } else {
-        el = document.createElement("input");
-        el.value = r.custom[cf.id] ?? "";
-      }
-
-      el.oninput = () => {
-        r.custom[cf.id] = (cf.type === "checkbox") ? (el.value === "true") : el.value;
-        touchRecord(r);
-      };
-      el.onchange = el.oninput;
-
-      field.appendChild(el);
-      wrap.appendChild(field);
-      host.appendChild(wrap);
-    });
-  }
-
-  function addCustomField(){
-    const ps = getActivePartnerState();
-    const label = prompt("Feldname (z. B. 'bKV Ansprechpartner'):");
-    if (!label) return;
-    const type = prompt("Feldtyp: text | textarea | checkbox", "text");
-    const t = (type || "text").toLowerCase();
-    if (!["text","textarea","checkbox"].includes(t)){
-      alert("Ungültiger Feldtyp.");
-      return;
-    }
-    const id = "cf_" + uid();
-    ps.customFields.push({ id, label, type: t });
-    // initialize for existing records
-    ps.records.forEach(r => { r.custom ||= {}; if (!(id in r.custom)) r.custom[id] = (t==="checkbox"?false:""); touchRecord(r); });
-    saveDB();
-    renderAll();
-  }
-
-  function deleteCustomField(){
-    const ps = getActivePartnerState();
-    if (!ps.customFields.length) return alert("Keine Zusatzfelder vorhanden.");
-    const list = ps.customFields.map((f,i)=>`${i+1}: ${f.label} (${f.type})`).join("\n");
-    const pick = prompt("Welches Feld löschen? Nummer eingeben:\n\n" + list);
-    const idx = Number(pick) - 1;
-    if (!Number.isInteger(idx) || idx < 0 || idx >= ps.customFields.length) return;
-
-    const cf = ps.customFields[idx];
-    if (!confirm(`Feld "${cf.label}" wirklich löschen? Werte in allen Datensätzen werden entfernt.`)) return;
-
-    ps.customFields.splice(idx,1);
-    ps.records.forEach(r => { if (r.custom) delete r.custom[cf.id]; touchRecord(r); });
-    saveDB();
-    renderAll();
-  }
-
-  // =======================
-  // Records add/delete
-  // =======================
-  function addRecord(){
-    const p = getActivePartner();
-    const ps = getActivePartnerState();
-    const r = baseRecord(p);
-    ps.records.push(r);
-    ps.activeRecordId = r.id;
-    saveDB();
-    renderAll();
-  }
-
-  function deleteRecord(){
-    const ps = getActivePartnerState();
-    if (ps.records.length <= 1) return alert("Mindestens 1 Reiter muss bestehen bleiben.");
-    const r = getActiveRecord();
-    if (!r) return;
-
-    if (!confirm("Diesen Reiter/Datensatz wirklich löschen?")) return;
-
-    const idx = ps.records.findIndex(x => x.id === r.id);
-    if (idx >= 0) ps.records.splice(idx,1);
-    ps.activeRecordId = ps.records[Math.max(0, idx-1)].id;
-    saveDB();
-    renderAll();
-  }
-
-  // =======================
-  // Search / results
-  // =======================
-  function recordSearchText(partnerName, r){
-    const kparts = [];
-    (r.kontakte || []).forEach(k => {
-      kparts.push(k.datum, k.anlass, k.notiz, k.followUpDatum, k.followUpThema, k.followUpErledigt ? "erledigt" : "offen");
-    });
-    const parts = [
-      partnerName,
-      r.rolle, r.makNummer,
-      r.name, r.firma, r.email, r.mobil, r.telefon,
-      r.strasse, r.plz, r.ort, r.land,
-      r.optin ? "optin" : "",
-      r.onlineAbschluss ? "online" : "",
-      ...kparts
-    ];
-    return parts.filter(Boolean).join(" ").toLowerCase();
-  }
-
-  function showResults(){
-    const q = ($("q").value || "").trim().toLowerCase();
-    if (!q) return alert("Bitte Suchbegriff eingeben.");
-    const hits = [];
-
-    PARTNERS.forEach(p => {
-      const ps = DB.partners[p.key];
-      ps.records.forEach(r => {
-        const txt = recordSearchText(p.name, r);
-        if (txt.includes(q)){
-          hits.push({ partnerKey: p.key, partnerName: p.name, recordId: r.id, rolle: r.rolle, mak: r.makNummer, name: r.name, firma: r.firma });
-        }
-      });
-    });
-
-    const host = $("resultsHost");
-    host.innerHTML = "";
-    if (!hits.length){
-      host.innerHTML = `<div class="muted">Keine Treffer.</div>`;
-    } else {
-      hits.slice(0,200).forEach(h => {
-        const row = document.createElement("div");
-        row.className = "listRow";
-        row.innerHTML = `
-          <div class="left">
-            <b>${escapeHtml(h.partnerName)}</b>
-            <div class="meta">${escapeHtml(h.rolle || "ohne Rolle")}${h.mak ? " · MAK " + escapeHtml(h.mak) : ""} · ${escapeHtml(h.name || h.firma || "—")}</div>
-          </div>
-          <div class="right">
-            <button class="ghost">Öffnen</button>
-          </div>
-        `;
-        row.querySelector("button").onclick = () => {
-          DB.activePartnerKey = h.partnerKey;
-          DB.partners[h.partnerKey].activeRecordId = h.recordId;
-          saveDB();
-          ACTIVE_PAGE = "main";
-          $("resultsWrap").style.display = "none";
-          renderAll();
-        };
-        host.appendChild(row);
-      });
-    }
-
-    $("resultsWrap").style.display = "";
-    window.scrollTo({ top: document.body.scrollHeight, behavior:"smooth" });
-  }
-
-  // =======================
-  // Follow-ups overview (ALL partners)
-  // =======================
-  function collectOpenFollowUpsAllPartners(){
-    const items = [];
-    PARTNERS.forEach(p => {
-      const ps = DB.partners[p.key];
-      ps.records.forEach(r => {
-        (r.kontakte || []).forEach((k, idx) => {
-          const due = (k.followUpDatum || "").trim();
-          const thema = (k.followUpThema || "").trim();
-          const done = !!k.followUpErledigt;
-          const isCandidate = (!!due || !!thema) && !done;
-          if (!isCandidate) return;
-
-          items.push({
-            partnerKey: p.key,
-            partnerName: p.name,
-            recordId: r.id,
-            rolle: (r.rolle || "").trim(),
-            mak: (r.makNummer || "").trim(),
-            kontaktIndex: idx + 1,
-            followUpDatum: due,
-            followUpThema: thema,
-            anlass: (k.anlass || "").trim(),
-            notiz: (k.notiz || "").trim(),
-            updatedAt: r.updatedAt || r.createdAt || ""
-          });
-        });
-      });
-    });
-
-    items.sort((a,b)=>{
-      const da = a.followUpDatum || "9999-12-31";
-      const db = b.followUpDatum || "9999-12-31";
-      if (da < db) return -1;
-      if (da > db) return 1;
-      return (b.updatedAt || "").localeCompare(a.updatedAt || "");
-    });
-
-    return items;
-  }
-
-  function gotoRecord(partnerKey, recordId){
-    DB.activePartnerKey = partnerKey;
-    DB.partners[partnerKey].activeRecordId = recordId;
-    saveDB();
-    ACTIVE_PAGE = "main";
-    renderAll();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function renderFollowUpOverviewAllPartners(){
-    const host = $("followUpAllHost");
-    if (!host) return;
-
-    const items = collectOpenFollowUpsAllPartners();
-    if (!items.length){
-      host.innerHTML = `<div class="muted">Keine offenen Wiedervorlagen gefunden 🎉</div>`;
-      return;
-    }
-
-    host.innerHTML = items.slice(0, 300).map(it => {
-      const due = it.followUpDatum ? escapeHtml(it.followUpDatum) : "—";
-      const mk = it.mak ? ` · MAK ${escapeHtml(it.mak)}` : "";
-      const rl = it.rolle ? ` · ${escapeHtml(it.rolle)}` : "";
-      const thema = it.followUpThema ? escapeHtml(it.followUpThema) : "—";
-
-      return `
-        <div class="listRow">
-          <div class="left">
-            <b>${escapeHtml(it.partnerName)}</b>${rl}${mk}
-            <div class="meta">Kontakt ${it.kontaktIndex} · Fällig: <b>${due}</b> · Thema: ${thema}</div>
-            <div class="meta">${it.anlass ? "Anlass: " + escapeHtml(it.anlass) + " · " : ""}${it.notiz ? "Notiz: " + escapeHtml(it.notiz) : ""}</div>
-          </div>
-          <div class="right">
-            <button class="ghost" data-p="${escapeHtml(it.partnerKey)}" data-r="${escapeHtml(it.recordId)}">Öffnen</button>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    host.querySelectorAll("button[data-p]").forEach(btn => {
-      btn.onclick = () => gotoRecord(btn.getAttribute("data-p"), btn.getAttribute("data-r"));
-    });
-  }
-
-  // =======================
-  // Stats (Auswertung)
-  // =======================
-  function ensureYearStats(ps, year){
-    ps.yearStats ||= {};
-    ps.yearStats[year] ||= {
-      gesamtZiel:"", gesamtIst:"",
-      vollZiel:"", vollIst:"",
-      beihilfeZiel:"", beihilfeIst:"",
-      zusatzZiel:"", zusatzIst:"",
-      bkvZiel:"", bkvIst:""
-    };
-    return ps.yearStats[year];
-  }
-
-  function initStatsSelectors(){
-    const sp = $("statsPartner");
-    const sy = $("statsYear");
-
-    sp.innerHTML = "";
-    PARTNERS.forEach(p => {
-      const opt = document.createElement("option");
-      opt.value = p.key;
-      opt.textContent = p.name;
-      sp.appendChild(opt);
-    });
-
-    const years = [];
-    for (let y=currentYear()-2; y<=currentYear()+1; y++) years.push(y);
-    sy.innerHTML = "";
-    years.forEach(y => {
-      const opt = document.createElement("option");
-      opt.value = String(y);
-      opt.textContent = String(y);
-      sy.appendChild(opt);
-    });
-
-    sp.value = DB.activePartnerKey;
-    sy.value = String(currentYear());
-
-    sp.onchange = () => { renderStats(); renderFollowUpOverviewAllPartners(); };
-    sy.onchange = () => { renderStats(); };
-  }
-
-  function monthlyBuckets(partnerKey, year){
-    const ps = DB.partners[partnerKey];
-    const buckets = Array.from({length:12}, () => ({
-      prodVoll:0, zielVoll:0,
-      prodBeihilfe:0, zielBeihilfe:0,
-      prodZusatz:0, zielZusatz:0,
-      prodBkv:0, zielBkv:0
-    }));
-
-    ps.records.forEach(r => {
-      const y = Number((r.datum || "").slice(0,4));
-      if (y !== year) return;
-
-      // Jahreswerte gleichmäßig auf 12 Monate verteilen
-      const mProdVoll = moneyParse(r.prodVoll)/12;
-      const mZielVoll = moneyParse(r.zielVoll)/12;
-
-      const mProdBeihilfe = moneyParse(r.prodBeihilfe)/12;
-      const mZielBeihilfe = moneyParse(r.zielBeihilfe)/12;
-
-      const mProdZusatz = moneyParse(r.prodZusatz)/12;
-      const mZielZusatz = moneyParse(r.zielZusatz)/12;
-
-      const mProdBkv = moneyParse(r.prodBkv)/12;
-      const mZielBkv = moneyParse(r.zielBkv)/12;
-
-      for (let i=0;i<12;i++){
-        const b = buckets[i];
-        b.prodVoll += mProdVoll; b.zielVoll += mZielVoll;
-        b.prodBeihilfe += mProdBeihilfe; b.zielBeihilfe += mZielBeihilfe;
-        b.prodZusatz += mProdZusatz; b.zielZusatz += mZielZusatz;
-        b.prodBkv += mProdBkv; b.zielBkv += mZielBkv;
-      }
-    });
-
-    return buckets;
-  }
-
-  function renderStats(){
-    if (ACTIVE_PAGE !== "stats") return;
-
-    const partnerKey = $("statsPartner").value;
-    const year = Number($("statsYear").value);
-    const ps = DB.partners[partnerKey];
-    const ys = ensureYearStats(ps, year);
-
-    // manual year stats bindings
-    const bind = (id, key) => {
-      const el = $(id);
-      el.value = ys[key] ?? "";
-      el.oninput = () => {
-        ys[key] = el.value;
-        saveDB();
-      };
-      el.onchange = el.oninput;
-    };
-
-    bind("gesamtZiel","gesamtZiel");
-    bind("gesamtIst","gesamtIst");
-    bind("vollZiel","vollZiel");
-    bind("vollIst","vollIst");
-    bind("beihilfeZiel","beihilfeZiel");
-    bind("beihilfeIst","beihilfeIst");
-    bind("zusatzZiel","zusatzZiel");
-    bind("zusatzIst","zusatzIst");
-    bind("bkvZiel","bkvZiel");
-    bind("bkvIst","bkvIst");
-
-    // monthly table
-    const months = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-    const buckets = monthlyBuckets(partnerKey, year);
-    const tb = $("monthTBody");
-    tb.innerHTML = "";
-
-    buckets.forEach((b, i) => {
-      const gp = b.prodVoll + b.prodBeihilfe + b.prodZusatz + b.prodBkv;
-      const gz = b.zielVoll + b.zielBeihilfe + b.zielZusatz + b.zielBkv;
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><b>${months[i]}</b></td>
-        <td>${moneyFormat(Math.round(b.prodVoll))}</td><td>${moneyFormat(Math.round(b.zielVoll))}</td>
-        <td>${moneyFormat(Math.round(b.prodBeihilfe))}</td><td>${moneyFormat(Math.round(b.zielBeihilfe))}</td>
-        <td>${moneyFormat(Math.round(b.prodZusatz))}</td><td>${moneyFormat(Math.round(b.zielZusatz))}</td>
-        <td>${moneyFormat(Math.round(b.prodBkv))}</td><td>${moneyFormat(Math.round(b.zielBkv))}</td>
-        <td><b>${moneyFormat(Math.round(gp))}</b></td>
-        <td><b>${moneyFormat(Math.round(gz))}</b></td>
-      `;
-      tb.appendChild(tr);
-    });
-  }
-
-  function exportStatsCSV(){
-    const partnerKey = $("statsPartner").value;
-    const year = Number($("statsYear").value);
-    const p = partnerByKey(partnerKey);
-    const buckets = monthlyBuckets(partnerKey, year);
-    const months = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-
-    const lines = [];
-    lines.push(["Partner","Jahr","Monat","ProdVoll","ZielVoll","ProdBeihilfe","ZielBeihilfe","ProdZusatz","ZielZusatz","ProdBkv","ZielBkv","GesamtProd","GesamtZiel"].join(";"));
-    buckets.forEach((b,i)=>{
-      const gp = b.prodVoll + b.prodBeihilfe + b.prodZusatz + b.prodBkv;
-      const gz = b.zielVoll + b.zielBeihilfe + b.zielZusatz + b.zielBkv;
-      lines.push([
-        p.name, year, months[i],
-        Math.round(b.prodVoll), Math.round(b.zielVoll),
-        Math.round(b.prodBeihilfe), Math.round(b.zielBeihilfe),
-        Math.round(b.prodZusatz), Math.round(b.zielZusatz),
-        Math.round(b.prodBkv), Math.round(b.zielBkv),
-        Math.round(gp), Math.round(gz)
-      ].join(";"));
-    });
-
-    downloadText(`auswertung_${p.name.replaceAll(" ","_")}_${year}.csv`, lines.join("\n"), "text/csv;charset=utf-8");
-  }
-
-  // =======================
-  // Export / Import / Merge
-  // =======================
-  function downloadText(filename, text, mime){
-    const blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url), 1000);
-  }
-
-  function exportFull(){
-    downloadText(`vertriebspartner_full_${todayISO()}.json`, JSON.stringify(DB, null, 2), "application/json");
-  }
-
-  function exportDelta(){
-    const day = todayISO();
-    const out = JSON.parse(JSON.stringify(DB));
-    // reduce records to those updated today
-    PARTNERS.forEach(p => {
-      const ps = out.partners[p.key];
-      ps.records = ps.records.filter(r => String(r.updatedAt || "").slice(0,10) === day);
-      ps.activeRecordId = ps.records[0]?.id || null;
-    });
-    out.exportMeta = { type:"delta", day, by: sessionUserSafe(), at: nowISO() };
-    downloadText(`vertriebspartner_delta_${day}.json`, JSON.stringify(out, null, 2), "application/json");
-  }
-
-  function exportCSV(){
-    // one row per record + next open follow-up
-    const lines = [];
-    lines.push([
-      "Partner","Reiter","Rolle","MAK","Datum",
-      "Name","Firma","Email","Mobil","Telefon",
-      "Strasse","PLZ","Ort","Land",
-      "Optin","OnlineAbschluss",
-      "ProdVoll","ZielVoll","ProdBeihilfe","ZielBeihilfe","ProdZusatz","ZielZusatz","ProdBkv","ZielBkv",
-      "NextFollowUpDatum","NextFollowUpThema","NextFollowUpAnlass"
-    ].join(";"));
-
-    PARTNERS.forEach(p => {
-      const ps = DB.partners[p.key];
-      ps.records.forEach((r, idx) => {
-        let next = null;
-        (r.kontakte||[]).forEach(k => {
-          if (k.followUpErledigt) return;
-          if (!k.followUpDatum && !k.followUpThema) return;
-          const d = k.followUpDatum || "9999-12-31";
-          if (!next || d < (next.followUpDatum || "9999-12-31")) next = k;
-        });
-
-        const row = [
-          p.name,
-          idx+1,
-          (r.rolle||""),
-          (r.makNummer||""),
-          (r.datum||""),
-          (r.name||""),
-          (r.firma||""),
-          (r.email||""),
-          (r.mobil||""),
-          (r.telefon||""),
-          (r.strasse||""),
-          (r.plz||""),
-          (r.ort||""),
-          (r.land||""),
-          r.optin ? "Ja" : "Nein",
-          r.onlineAbschluss ? "Ja" : "Nein",
-          r.prodVoll||"", r.zielVoll||"",
-          r.prodBeihilfe||"", r.zielBeihilfe||"",
-          r.prodZusatz||"", r.zielZusatz||"",
-          r.prodBkv||"", r.zielBkv||"",
-          next ? (next.followUpDatum||"") : "",
-          next ? (next.followUpThema||"") : "",
-          next ? (next.anlass||"") : ""
-        ].map(v => String(v).replaceAll("\n"," ").replaceAll("; ",", "));
-
-        lines.push(row.join(";"));
-      });
-    });
-
-    downloadText(`vertriebspartner_${todayISO()}.csv`, lines.join("\n"), "text/csv;charset=utf-8");
-  }
-
-  async function importFiles(fileList){
-    const files = Array.from(fileList || []);
-    if (!files.length) return;
-
-    const loaded = [];
-    for (const f of files){
-      const txt = await f.text();
-      const obj = safeJSONParse(txt);
-      if (!obj || !obj.partners){
-        alert(`Datei "${f.name}" ist keine gültige Export-Datei.`);
-        return;
-      }
-      loaded.push(obj);
-    }
-
-    // merge in order
-    loaded.forEach(obj => mergeDB(obj));
-    saveDB();
-    renderAll();
-    alert(`Import/Merge abgeschlossen (${files.length} Datei(en)).`);
-  }
-
-  function mergeDB(incoming){
-    // Merge: record by id -> keep newest updatedAt
-    PARTNERS.forEach(p => {
-      const psLocal = DB.partners[p.key];
-      const psIn = incoming.partners[p.key];
-      if (!psIn) return;
-
-      // customFields union by id
-      psLocal.customFields ||= [];
-      (psIn.customFields || []).forEach(cf => {
-        if (!psLocal.customFields.find(x => x.id === cf.id)){
-          psLocal.customFields.push(cf);
-        }
-      });
-
-      // yearStats merge (prefer incoming if non-empty strings)
-      psLocal.yearStats ||= {};
-      const ysIn = psIn.yearStats || {};
-      Object.keys(ysIn).forEach(year => {
-        const tgt = ensureYearStats(psLocal, year);
-        const src = ysIn[year] || {};
-        Object.keys(tgt).forEach(k => {
-          if (String(src[k] ?? "").trim() !== "") tgt[k] = src[k];
-        });
-      });
-
-      // records merge
-      const byId = new Map(psLocal.records.map(r => [r.id, r]));
-      (psIn.records || []).forEach(rIn => {
-        const rLocal = byId.get(rIn.id);
-        if (!rLocal){
-          psLocal.records.push(rIn);
-          byId.set(rIn.id, rIn);
-          return;
-        }
-        const tLocal = String(rLocal.updatedAt || "");
-        const tIn = String(rIn.updatedAt || "");
-        if (tIn > tLocal){
-          Object.keys(rLocal).forEach(k => delete rLocal[k]);
-          Object.assign(rLocal, rIn);
-        }
-      });
-
-      // ensure activeRecordId
-      if (!psLocal.activeRecordId) psLocal.activeRecordId = psLocal.records[0]?.id || null;
-    });
-
-    // keep incoming activePartnerKey only if local missing
-    if (!DB.activePartnerKey) DB.activePartnerKey = incoming.activePartnerKey || PARTNERS[0].key;
-
-    // refresh/ensure schema
-    DB = loadDB();
-  }
-
-  // =======================
-  // Render All
-  // =======================
+  // ========= Render all =========
   function renderAll(){
-    const session = getSession();
-    const loggedIn = !!session;
+    DB = loadDB();
 
-    $("who").textContent = loggedIn ? `${session.user} (${session.role})` : "nicht eingeloggt";
-    $("who").className = "pill" + (loggedIn ? " ok" : "");
+    const sess = getSession();
+    const loggedIn = !!sess;
 
-    $("loginCard").style.display = loggedIn ? "none" : "";
-    $("navCard").style.display = loggedIn ? "" : "none";
-    $("mainCard").style.display = loggedIn ? "" : "none";
+    $("who").textContent = loggedIn ? `${sess.user} (${sess.role})` : "nicht eingeloggt";
 
-    // lock controls when not logged in
-    const lockIds = ["btnPrint","btnNewField","btnDeleteField","btnExportDelta","btnExportFull","btnExportCSV","btnImport","btnLogout","tabMain","tabStats"];
-    lockIds.forEach(id => { const el = $(id); if (el) el.disabled = !loggedIn; });
+    $("loginCard").classList.toggle("hidden", loggedIn);
+    $("navCard").classList.toggle("hidden", !loggedIn);
+    $("mainCard").classList.toggle("hidden", !loggedIn);
+    $("statsCard").classList.add("hidden"); // default to main
+    $("tabMain").classList.add("active");
+    $("tabStats").classList.remove("active");
 
     if (!loggedIn){
-      setStatus("bereit","");
+      setStatus("bereit", "");
       return;
     }
 
-    ensureOneRecord();
-    setStatus("eingeloggt","ok");
+    setStatus("eingeloggt", "ok");
 
-    // tabs
-    $("tabMain").classList.toggle("active", ACTIVE_PAGE === "main");
-    $("tabStats").classList.toggle("active", ACTIVE_PAGE === "stats");
-    $("viewMain").style.display = (ACTIVE_PAGE === "main") ? "" : "none";
-    $("viewStats").style.display = (ACTIVE_PAGE === "stats") ? "" : "none";
+    // partner theme
+    document.body.setAttribute("data-partner", ACTIVE_PARTNER_KEY);
 
     renderPartnerTabs();
     renderRecordSelect();
+    renderYearSelect();
+    renderStatsPartnerSelect();
     renderForm();
-
-    // stats page: set selector values and render
-    if (ACTIVE_PAGE === "stats"){
-      $("statsPartner").value = DB.activePartnerKey;
-      renderStats();
-      renderFollowUpOverviewAllPartners();
-    } else {
-      // still keep follow-up cache up to date
-      renderFollowUpOverviewAllPartners();
-    }
+    renderFollowupsGlobal();
   }
 
-  // =======================
-  // Init
-  // =======================
+  // ========= Init =========
   initLoginUI();
   bindAllInputs();
-  initStatsSelectors();
+  bindMainInputs();
   renderAll();
-
 })();
 </script>
 </body>
