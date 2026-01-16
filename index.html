@@ -65,6 +65,7 @@
     .pill.ok{border-color:rgba(16,185,129,.30); background:rgba(16,185,129,.10); color:#065f46}
     .pill.warn{border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.12); color:#92400e}
     .pill.bad{border-color:rgba(244,63,94,.35); background:rgba(244,63,94,.12); color:#9f1239}
+
     .spacer{flex:1}
 
     .actions{display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end}
@@ -72,21 +73,15 @@
       appearance:none; border:1px solid var(--line);
       background:rgba(255,255,255,.9);
       padding:9px 12px; border-radius:12px;
-      font-weight:600; cursor:pointer;
+      font-weight:700; cursor:pointer;
       box-shadow:0 1px 0 rgba(0,0,0,.03);
     }
     button:hover{border-color:rgba(29,78,216,.35)}
     button.primary{background:var(--pf-main); color:white; border-color:transparent}
     button.danger{background:rgba(244,63,94,.10); border-color:rgba(244,63,94,.35); color:#9f1239}
     button.ghost{background:transparent}
-    button.tab{
-      padding:8px 12px; border-radius:999px; background:transparent;
-    }
-    button.tab.active{
-      background:var(--pf-soft);
-      border-color:transparent;
-      color:var(--pf-main);
-    }
+    button.tab{padding:8px 12px; border-radius:999px; background:transparent}
+    button.tab.active{background:var(--pf-soft); border-color:transparent; color:var(--pf-main)}
 
     .wrap{
       max-width:1280px; margin:18px auto;
@@ -104,7 +99,7 @@
       box-shadow:var(--shadow);
       padding:16px;
     }
-    .h{font-size:18px; font-weight:800}
+    .h{font-size:18px; font-weight:900}
     .muted{color:var(--muted); font-size:13px}
     .divider{height:1px; background:var(--line); margin:14px 0}
 
@@ -121,7 +116,7 @@
     .field.w6{flex:0 0 calc(50% - 10px); min-width:220px}
     .field.w12{flex:0 0 100%}
 
-    label{font-size:12px; color:var(--muted); font-weight:700}
+    label{font-size:12px; color:var(--muted); font-weight:800}
     input, select, textarea{
       border:1px solid rgba(11,27,51,.16);
       border-radius:14px;
@@ -153,7 +148,7 @@
       border:1px solid color-mix(in srgb, var(--pf-main) 35%, transparent);
       color:var(--pf-main);
       font-size:12px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.03em;
       text-transform:uppercase;
     }
@@ -163,7 +158,7 @@
       padding:8px 10px; border-radius:999px;
       border:1px solid var(--line);
       background:rgba(255,255,255,.85);
-      font-weight:700;
+      font-weight:800;
       cursor:pointer;
       font-size:12px;
     }
@@ -172,7 +167,7 @@
 
     table{width:100%; border-collapse:separate; border-spacing:0}
     th, td{font-size:12px; padding:10px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
-    th{color:var(--muted); font-weight:800; background:rgba(255,255,255,.65); position:sticky; top:0}
+    th{color:var(--muted); font-weight:900; background:rgba(255,255,255,.65); position:sticky; top:0}
     .tblWrap{max-height:360px; overflow:auto; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.7)}
 
     .hidden{display:none !important}
@@ -204,9 +199,8 @@
     <div class="spacer"></div>
 
     <div class="actions">
-      <span class="pill">localStorage · offline</span>
       <button id="btnPrint">Drucken</button>
-      <button id="btnNewField">Neue Felder erstellen</button>
+      <button id="btnNewField">Neue Felder</button>
       <button class="danger" id="btnDeleteField">Feld löschen</button>
 
       <button id="btnExportDelta">Export (Delta heute)</button>
@@ -227,7 +221,7 @@
   <aside class="card" id="loginCard">
     <div class="h">Login (offline)</div>
     <div class="muted" style="margin-top:6px;">
-      Diese App speichert lokal im Browser. Für tägliches Zusammenführen bitte Export/Import nutzen.
+      Daten werden lokal im Browser gespeichert. Restore nach „Lokale Daten löschen“: <b>Import (Replace)</b>.
     </div>
 
     <div class="row" style="margin-top:12px;">
@@ -244,15 +238,13 @@
 
     <div class="row" style="margin-top:12px;">
       <button class="primary" id="btnLogin" style="width:180px">Login</button>
-      <button class="ghost" id="btnClearLocal" title="Löscht nur die lokalen Daten dieses Browsers">Lokale Daten löschen</button>
+      <button class="ghost" id="btnClearLocal" title="Löscht DB+Session dieses Browsers">Lokale Daten löschen</button>
       <span class="pill" id="loginHint">—</span>
     </div>
 
     <div class="divider"></div>
-
     <div class="mini">
-      <div><b>Wichtig:</b> „Lokale Daten löschen“ entfernt die komplette DB dieses Browsers.</div>
-      <div>Restore danach: <b>Import (Replace)</b> mit einer Voll-Datei.</div>
+      <div><b>Team-Workflow:</b> Mitarbeiter senden <b>Delta</b>, Master verteilt <b>SAFE Voll</b>.</div>
     </div>
   </aside>
 
@@ -274,22 +266,9 @@
 
     <div class="h">Suche</div>
     <input id="q" placeholder="Name / Firma / E-Mail / Rolle / MAK / Anlass …">
-    <div class="muted" style="margin-top:6px;">Suche innerhalb der lokal gespeicherten Daten.</div>
-
     <div class="row" style="margin-top:10px;">
       <button id="btnFind">Trefferliste</button>
       <button class="ghost" id="btnCloseResults">Schließen</button>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="mini">
-      <div><b>Team-Workflow:</b></div>
-      <ol style="margin:8px 0 0 18px;padding:0;">
-        <li>Mitarbeiter: Export (Delta heute)</li>
-        <li>Master: Import/Merge (alle Deltas)</li>
-        <li>Master: SAFE Export (Voll) zurück an Team</li>
-      </ol>
     </div>
   </aside>
 
@@ -305,19 +284,16 @@
     <div class="row" style="margin-top:12px;">
       <div class="field w5">
         <label>Rolle (frei)</label>
-        <input id="rolle" placeholder="z. B. RDPartner / DirektPartner / Account / …">
+        <input id="rolle" placeholder="z. B. RDPartner / DirektPartner / …">
       </div>
-
       <div class="field w3">
         <label>Partnernummer</label>
         <input id="partnerNummer" placeholder="Partnernummer">
       </div>
-
       <div class="field w2" id="makWrap">
         <label>MAK (nur Fonds/DEMV)</label>
         <input id="mak" placeholder="MAK-Nummer">
       </div>
-
       <div class="field w2">
         <label>Datum (Reiter)</label>
         <input id="datum" type="date">
@@ -331,25 +307,25 @@
       </div>
 
       <div class="row">
-        <div class="field w6"><label>Vorname</label><input id="vorname" placeholder="Vorname"></div>
-        <div class="field w6"><label>Nachname</label><input id="nachname" placeholder="Nachname"></div>
+        <div class="field w6"><label>Vorname</label><input id="vorname"></div>
+        <div class="field w6"><label>Nachname</label><input id="nachname"></div>
       </div>
 
       <div class="row" style="margin-top:10px;">
-        <div class="field w6"><label>Firma</label><input id="firma" placeholder="Unternehmen / Einheit"></div>
-        <div class="field w6"><label>E-Mail</label><input id="email" placeholder="name@firma.de"></div>
+        <div class="field w6"><label>Firma</label><input id="firma"></div>
+        <div class="field w6"><label>E-Mail</label><input id="email"></div>
       </div>
 
       <div class="row" style="margin-top:10px;">
-        <div class="field w6"><label>Mobil</label><input id="mobil" type="tel" placeholder="+49 …"></div>
-        <div class="field w6"><label>Telefon</label><input id="telefon" type="tel" placeholder="z. B. 0711 …"></div>
+        <div class="field w6"><label>Mobil</label><input id="mobil" type="tel"></div>
+        <div class="field w6"><label>Telefon</label><input id="telefon" type="tel"></div>
       </div>
 
       <div class="row" style="margin-top:10px;">
-        <div class="field w6"><label>Straße</label><input id="strasse" placeholder="Straße + Nr."></div>
-        <div class="field w2"><label>PLZ</label><input id="plz" placeholder="12345"></div>
-        <div class="field w4"><label>Ort</label><input id="ort" placeholder="Ort"></div>
-        <div class="field w2"><label>Land</label><input id="land" placeholder="DE"></div>
+        <div class="field w6"><label>Straße</label><input id="strasse"></div>
+        <div class="field w2"><label>PLZ</label><input id="plz"></div>
+        <div class="field w4"><label>Ort</label><input id="ort"></div>
+        <div class="field w2"><label>Land</label><input id="land"></div>
       </div>
 
       <div class="row" style="margin-top:10px;">
@@ -364,14 +340,14 @@
           <label>Optin</label>
           <div style="display:flex; align-items:center; gap:10px;">
             <input id="optin" type="checkbox" style="width:auto; transform:scale(1.2);">
-            <span class="muted">Einwilligung liegt vor</span>
+            <span class="muted">Einwilligung</span>
           </div>
         </div>
         <div class="field w4">
           <label>Online Abschluss</label>
           <div style="display:flex; align-items:center; gap:10px;">
             <input id="online" type="checkbox" style="width:auto; transform:scale(1.2);">
-            <span class="muted">online Abschluss</span>
+            <span class="muted">online</span>
           </div>
         </div>
       </div>
@@ -387,9 +363,6 @@
     <div class="divider"></div>
 
     <div class="h">Kontakt-Historie (inkl. Wiedervorlage)</div>
-    <div class="muted" style="margin-top:6px;">
-      Jeder Kontakt enthält optional eine Wiedervorlage (Datum + Thema) und „erledigt“.
-    </div>
     <div id="contactsWrap" style="margin-top:12px;"></div>
 
     <div class="row" style="margin-top:10px;">
@@ -404,25 +377,17 @@
     <div class="divider"></div>
 
     <div class="h">Zusatzfelder (Custom)</div>
-    <div class="muted" style="margin-top:6px;">Partnerbezogene Zusatzfelder (über „Neue Felder erstellen“).</div>
     <div id="customFieldsWrap" style="margin-top:12px;"></div>
   </main>
 
   <main class="card hidden" id="statsCard">
     <div class="h">Auswertung</div>
-    <div class="muted" style="margin-top:6px;">
-      Globale Wiedervorlagen-Übersicht über alle Partner.
-    </div>
-
+    <div class="muted" style="margin-top:6px;">Globale Wiedervorlagen über alle Partner.</div>
     <div class="divider"></div>
-
-    <div class="h">Offene Wiedervorlagen (global)</div>
     <div class="tblWrap" style="margin-top:12px;">
       <table>
         <thead>
-        <tr>
-          <th>Fällig</th><th>Partner</th><th>Reiter</th><th>Kontakt</th><th>Anlass</th><th>Thema</th><th>Notiz</th>
-        </tr>
+          <tr><th>Fällig</th><th>Partner</th><th>Reiter</th><th>Kontakt</th><th>Anlass</th><th>Thema</th><th>Notiz</th></tr>
         </thead>
         <tbody id="followupsTbody"></tbody>
       </table>
@@ -440,9 +405,7 @@
     <div class="tblWrap" style="margin-top:12px; max-height:420px;">
       <table>
         <thead>
-        <tr>
-          <th>Partner</th><th>Reiter</th><th>Rolle</th><th>MAK</th><th>Partnernr</th><th>Name</th><th>Firma</th><th>E-Mail</th><th>Tel/Mobil</th><th>Ort</th>
-        </tr>
+          <tr><th>Partner</th><th>Reiter</th><th>Rolle</th><th>MAK</th><th>Partnernr</th><th>Name</th><th>Firma</th><th>E-Mail</th><th>Tel/Mobil</th><th>Ort</th></tr>
         </thead>
         <tbody id="resultsTbody"></tbody>
       </table>
@@ -452,10 +415,10 @@
 
 <script>
 (() => {
-  // ========= Config =========
+  // ========= App meta =========
   const APP_NAME = "Vertriebspartner Offline";
-  const APP_FORMAT = "VP_SAFE_EXPORT_V1";
-  const APP_BUILD = "2026-01-16-importfix";
+  const SAFE_FORMAT = "VP_SAFE_EXPORT_V1";
+  const BUILD = "2026-01-16-v4-migration-importsafe";
 
   const PARTNERS = [
     { key:"fonds_finanz", name:"Fonds Finanz", hasMak:true },
@@ -465,17 +428,19 @@
     { key:"wir_finanz",  name:"WIR-Finanz",  hasMak:false },
   ];
 
-  // IMPORTANT: Stable storage keys (do not change later)
-  const STORAGE_KEY = "vp_offline_db_v3";
-  const SESSION_KEY = "vp_offline_session_v3";
-  const USERS_KEY   = "vp_offline_users_v3";
+  // NEW storage keys (v4)
+  const STORAGE_KEY = "vp_offline_db_v4";
+  const SESSION_KEY = "vp_offline_session_v4";
+  const USERS_KEY   = "vp_offline_users_v4";
+
+  // OLD keys (auto-migration)
+  const OLD_STORAGE_KEYS = ["vp_offline_db_v3","vp_offline_db_v2","vp_offline_db_v1","vp_offline_db"];
 
   const $ = (id) => document.getElementById(id);
 
   function todayISO(){ return new Date().toISOString().slice(0,10); }
   function nowISO(){ return new Date().toISOString(); }
   function uid(){ return Math.random().toString(36).slice(2,10)+"-"+Date.now().toString(36); }
-
   function safeJSONParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
 
   function setStatus(text, kind=""){
@@ -573,29 +538,6 @@
   }
 
   // ========= DB Model =========
-  function emptyDB(){
-    const partners = {};
-    PARTNERS.forEach(p => {
-      partners[p.key] = {
-        key: p.key,
-        customFields: [],
-        records: [],
-        activeRecordId: null
-      };
-      const r = baseRecord(p);
-      partners[p.key].records.push(r);
-      partners[p.key].activeRecordId = r.id;
-    });
-    return {
-      app: APP_NAME,
-      format: "VP_DB",
-      version: 3,
-      createdAt: nowISO(),
-      updatedAt: nowISO(),
-      partners
-    };
-  }
-
   function baseRecord(partner){
     return {
       id: uid(),
@@ -625,12 +567,6 @@
       optin: false,
       onlineAbschluss: false,
 
-      // yearly manual (kept for future pages)
-      gesamtZiel:"", gesamtIst:"", vollZiel:"", vollIst:"",
-      beihilfeZiel:"", beihilfeIst:"", zusatzZiel:"", zusatzIst:"",
-      pflegeZiel:"", pflegeIst:"", bkvZiel:"", bkvIst:"",
-      reiseZiel:"", reiseIst:"",
-
       kontakte: [
         { id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() }
       ],
@@ -640,29 +576,44 @@
     };
   }
 
-  // ---- schema ensure WITHOUT reloading localStorage (IMPORT FIX)
+  function emptyDB(){
+    const partners = {};
+    PARTNERS.forEach(p => {
+      const r = baseRecord(p);
+      partners[p.key] = { key:p.key, customFields:[], records:[r], activeRecordId:r.id };
+    });
+    return {
+      app: APP_NAME,
+      format: "VP_DB",
+      version: 4,
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
+      partners
+    };
+  }
+
   function ensureSchema(db){
     if (!db || !db.partners) db = emptyDB();
+    db.app ||= APP_NAME;
+    db.format ||= "VP_DB";
+    db.version ||= 4;
 
-    PARTNERS.forEach(p => {
+    PARTNERS.forEach(p=>{
       if (!db.partners[p.key]) db.partners[p.key] = { key:p.key, customFields:[], records:[], activeRecordId:null };
       const ps = db.partners[p.key];
-
       ps.customFields ||= [];
       ps.records ||= [];
-
       if (ps.records.length === 0){
         const r = baseRecord(p);
         ps.records.push(r);
         ps.activeRecordId = r.id;
       }
-
       ps.activeRecordId ||= (ps.records[0] && ps.records[0].id);
 
-      ps.records.forEach(r => {
+      ps.records.forEach(r=>{
         r.custom ||= {};
-        r.updatedAt ||= r.createdAt || nowISO();
-        r.createdAt ||= r.updatedAt || nowISO();
+        r.createdAt ||= nowISO();
+        r.updatedAt ||= r.createdAt;
         r.updatedBy ||= "unknown";
 
         r.datum ||= todayISO();
@@ -687,19 +638,11 @@
         r.optin ??= false;
         r.onlineAbschluss ??= false;
 
-        r.gesamtZiel ??= ""; r.gesamtIst ??= "";
-        r.vollZiel ??= ""; r.vollIst ??= "";
-        r.beihilfeZiel ??= ""; r.beihilfeIst ??= "";
-        r.zusatzZiel ??= ""; r.zusatzIst ??= "";
-        r.pflegeZiel ??= ""; r.pflegeIst ??= "";
-        r.bkvZiel ??= ""; r.bkvIst ??= "";
-        r.reiseZiel ??= ""; r.reiseIst ??= "";
-
         if (!Array.isArray(r.kontakte)) r.kontakte = [];
         if (r.kontakte.length === 0){
           r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
         }
-        r.kontakte.forEach(k => {
+        r.kontakte.forEach(k=>{
           k.id ||= uid();
           k.datum ||= "";
           k.anlass ||= "";
@@ -720,28 +663,41 @@
     return db;
   }
 
-  function loadDB(){
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? safeJSONParse(raw) : null;
-    DB = ensureSchema(parsed);
-    saveDB(DB);
-    return DB;
-  }
-
   function saveDB(db){
     db.updatedAt = nowISO();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
   }
 
-  let DB = loadDB();
+  // -------- migration: old key -> new key (only if new key empty)
+  function migrateIfNeeded(){
+    const hasNew = !!localStorage.getItem(STORAGE_KEY);
+    if (hasNew) return;
+
+    for (const k of OLD_STORAGE_KEYS){
+      const raw = localStorage.getItem(k);
+      const parsed = raw ? safeJSONParse(raw) : null;
+      if (parsed && parsed.partners){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        setStatus("Migration: alte Daten übernommen", "ok");
+        return;
+      }
+    }
+  }
+
+  // ========= Global state =========
+  migrateIfNeeded();
+
+  let DB = ensureSchema(safeJSONParse(localStorage.getItem(STORAGE_KEY))) || ensureSchema(emptyDB());
+  saveDB(DB);
+
   let ACTIVE_PARTNER_KEY = PARTNERS[0].key;
 
-  function getActivePartner(){ return PARTNERS.find(p => p.key === ACTIVE_PARTNER_KEY) || PARTNERS[0]; }
   function getPartnerState(key){ return DB.partners[key]; }
+  function getActivePartner(){ return PARTNERS.find(p=>p.key===ACTIVE_PARTNER_KEY) || PARTNERS[0]; }
   function getActivePartnerState(){ return getPartnerState(ACTIVE_PARTNER_KEY); }
   function getActiveRecord(){
     const ps = getActivePartnerState();
-    return ps.records.find(r => r.id === ps.activeRecordId) || ps.records[0];
+    return ps.records.find(r=>r.id===ps.activeRecordId) || ps.records[0];
   }
 
   function touch(rec){
@@ -752,7 +708,7 @@
     $("autosavePill").className = "pill ok";
   }
 
-  // ========= UI =========
+  // ========= Labels / tabs =========
   function recordLabel(p, r, idx){
     const role = ((r.rolle || "").trim()) || "ohne Rolle";
     const fn = ((r.vorname||"").trim() + " " + (r.nachname||"").trim()).trim();
@@ -765,10 +721,10 @@
   function renderPartnerTabs(){
     const wrap = $("partnerTabs");
     wrap.innerHTML = "";
-    PARTNERS.forEach(p => {
+    PARTNERS.forEach(p=>{
       const b = document.createElement("button");
       b.textContent = p.name;
-      b.className = (p.key === ACTIVE_PARTNER_KEY) ? "active" : "";
+      b.className = p.key===ACTIVE_PARTNER_KEY ? "active" : "";
       b.onclick = () => {
         ACTIVE_PARTNER_KEY = p.key;
         document.body.setAttribute("data-partner", p.key);
@@ -783,15 +739,16 @@
     const ps = getActivePartnerState();
     const sel = $("recordSelect");
     sel.innerHTML = "";
-    ps.records.forEach((r, idx) => {
+    ps.records.forEach((r, idx)=>{
       const opt = document.createElement("option");
       opt.value = r.id;
       opt.textContent = recordLabel(p, r, idx);
-      if (r.id === ps.activeRecordId) opt.selected = true;
+      if (r.id===ps.activeRecordId) opt.selected = true;
       sel.appendChild(opt);
     });
   }
 
+  // ========= Form render =========
   function setFieldValue(id, value){
     const el = $(id);
     if (!el) return;
@@ -835,17 +792,17 @@
     const wrap = $("contactsWrap");
     wrap.innerHTML = "";
 
-    r.kontakte.forEach((k, idx) => {
+    r.kontakte.forEach((k, idx)=>{
       const box = document.createElement("div");
       box.className = "card";
       box.style.padding = "12px";
       box.style.marginBottom = "10px";
 
       const head = document.createElement("div");
-      head.style.display = "flex";
-      head.style.justifyContent = "space-between";
-      head.style.alignItems = "center";
-      head.style.gap = "10px";
+      head.style.display="flex";
+      head.style.justifyContent="space-between";
+      head.style.alignItems="center";
+      head.style.gap="10px";
       head.innerHTML = `<div style="font-weight:900;">Kontakt ${idx+1}</div>
                         <div class="pill ${k.followUpDatum && !k.followUpErledigt ? "warn" : ""}">
                           ${k.followUpDatum && !k.followUpErledigt ? "Wiedervorlage offen" : "—"}
@@ -853,64 +810,59 @@
       box.appendChild(head);
 
       const row1 = document.createElement("div");
-      row1.className = "row";
-      row1.style.marginTop = "10px";
+      row1.className="row";
+      row1.style.marginTop="10px";
       row1.innerHTML = `
         <div class="field w3"><label>Kontakt-Datum</label><input type="date" data-k="${k.id}" data-f="datum"></div>
-        <div class="field w3"><label>Anlass</label><input data-k="${k.id}" data-f="anlass" placeholder="Anlass"></div>
-        <div class="field w6"><label>Notiz</label><input data-k="${k.id}" data-f="notiz" placeholder="Notiz"></div>
-      `;
+        <div class="field w3"><label>Anlass</label><input data-k="${k.id}" data-f="anlass"></div>
+        <div class="field w6"><label>Notiz</label><input data-k="${k.id}" data-f="notiz"></div>`;
       box.appendChild(row1);
 
       const row2 = document.createElement("div");
-      row2.className = "row";
-      row2.style.marginTop = "10px";
+      row2.className="row";
+      row2.style.marginTop="10px";
       row2.innerHTML = `
         <div class="field w3"><label>Wiedervorlage-Datum</label><input type="date" data-k="${k.id}" data-f="followUpDatum"></div>
-        <div class="field w6"><label>Thema (Wiedervorlage)</label><input data-k="${k.id}" data-f="followUpThema" placeholder="Thema / Beschreibungsfeld"></div>
+        <div class="field w6"><label>Thema</label><input data-k="${k.id}" data-f="followUpThema"></div>
         <div class="field w3"><label>Erledigt</label>
           <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid rgba(11,27,51,.16); border-radius:14px; background:rgba(255,255,255,.92);">
             <input type="checkbox" data-k="${k.id}" data-f="followUpErledigt" style="width:auto; transform:scale(1.2);">
-            <span class="muted">Wiedervorlage erledigt</span>
+            <span class="muted">erledigt</span>
           </div>
-        </div>
-      `;
+        </div>`;
       box.appendChild(row2);
 
       const row3 = document.createElement("div");
-      row3.className = "row";
-      row3.style.marginTop = "10px";
+      row3.className="row";
+      row3.style.marginTop="10px";
       row3.innerHTML = `<button class="danger" data-del-k="${k.id}">Kontakt löschen</button>`;
       box.appendChild(row3);
 
       wrap.appendChild(box);
 
-      box.querySelectorAll("input[data-k]").forEach(inp => {
+      box.querySelectorAll("input[data-k]").forEach(inp=>{
         const fid = inp.getAttribute("data-f");
-        if (inp.type === "checkbox") inp.checked = !!k[fid];
+        if (inp.type==="checkbox") inp.checked = !!k[fid];
         else inp.value = k[fid] || "";
-      });
 
-      box.querySelectorAll("input[data-k]").forEach(inp => {
-        inp.oninput = () => {
-          const rid = inp.getAttribute("data-k");
-          const fid = inp.getAttribute("data-f");
-          const kk = r.kontakte.find(x => x.id === rid);
+        const handler = () => {
+          const kk = r.kontakte.find(x=>x.id===inp.getAttribute("data-k"));
           if (!kk) return;
-          if (inp.type === "checkbox") kk[fid] = !!inp.checked;
+          if (inp.type==="checkbox") kk[fid] = !!inp.checked;
           else kk[fid] = inp.value;
           kk.updatedAt = nowISO();
           touch(r);
           renderFollowupsGlobal();
         };
-        inp.onchange = inp.oninput;
+        inp.oninput = handler;
+        inp.onchange = handler;
       });
 
-      box.querySelectorAll("button[data-del-k]").forEach(btn => {
+      box.querySelectorAll("button[data-del-k]").forEach(btn=>{
         btn.onclick = () => {
           if (!confirm("Kontakt wirklich löschen?")) return;
-          r.kontakte = r.kontakte.filter(x => x.id !== btn.getAttribute("data-del-k"));
-          if (r.kontakte.length === 0){
+          r.kontakte = r.kontakte.filter(x=>x.id!==btn.getAttribute("data-del-k"));
+          if (r.kontakte.length===0){
             r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
           }
           touch(r);
@@ -921,6 +873,10 @@
     });
   }
 
+  function escapeHTML(s){
+    return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
   function renderCustomFields(){
     const ps = getActivePartnerState();
     const r = getActiveRecord();
@@ -928,20 +884,20 @@
     wrap.innerHTML = "";
 
     if (!ps.customFields.length){
-      wrap.innerHTML = `<div class="muted">Keine Zusatzfelder für diesen Partner angelegt.</div>`;
+      wrap.innerHTML = `<div class="muted">Keine Zusatzfelder.</div>`;
       return;
     }
 
     const row = document.createElement("div");
     row.className = "row";
 
-    ps.customFields.forEach(cf => {
+    ps.customFields.forEach(cf=>{
       const f = document.createElement("div");
       f.className = "field w6";
       f.innerHTML = `<label>${escapeHTML(cf.label)}</label>`;
       const id = "cf_"+cf.id;
 
-      if (cf.type === "checkbox"){
+      if (cf.type==="checkbox"){
         const container = document.createElement("div");
         container.style.display="flex";
         container.style.alignItems="center";
@@ -950,13 +906,12 @@
         container.style.border="1px solid rgba(11,27,51,.16)";
         container.style.borderRadius="14px";
         container.style.background="rgba(255,255,255,.92)";
-        container.innerHTML = `<input type="checkbox" id="${id}" style="width:auto; transform:scale(1.2);">
-                               <span class="muted">Ja / Nein</span>`;
+        container.innerHTML = `<input type="checkbox" id="${id}" style="width:auto; transform:scale(1.2);"><span class="muted">Ja/Nein</span>`;
         f.appendChild(container);
         const el = container.querySelector("input");
         el.checked = !!r.custom[cf.id];
         el.onchange = () => { r.custom[cf.id] = !!el.checked; touch(r); };
-      } else if (cf.type === "textarea"){
+      } else if (cf.type==="textarea"){
         const el = document.createElement("textarea");
         el.id = id;
         el.value = r.custom[cf.id] || "";
@@ -976,19 +931,70 @@
     wrap.appendChild(row);
   }
 
-  function escapeHTML(s){
-    return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // ========= Followups global =========
+  function parseDateISO(s){
+    if (!s) return null;
+    const t = Date.parse(s);
+    return Number.isFinite(t) ? t : null;
+  }
+
+  function renderFollowupsGlobal(){
+    const tb = $("followupsTbody");
+    tb.innerHTML = "";
+    const items = [];
+
+    PARTNERS.forEach(p=>{
+      const ps = getPartnerState(p.key);
+      ps.records.forEach((r, ridx)=>{
+        (r.kontakte||[]).forEach((k, kidx)=>{
+          if (k.followUpDatum && !k.followUpErledigt){
+            items.push({ p, r, ridx, k, kidx, dueT: parseDateISO(k.followUpDatum) || 9e15 });
+          }
+        });
+      });
+    });
+
+    items.sort((a,b)=>a.dueT-b.dueT);
+
+    if (!items.length){
+      const tr=document.createElement("tr");
+      tr.innerHTML = `<td colspan="7" class="muted">Keine offenen Wiedervorlagen.</td>`;
+      tb.appendChild(tr);
+      return;
+    }
+
+    items.slice(0,500).forEach(it=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${escapeHTML(it.k.followUpDatum)}</b></td>
+        <td>${escapeHTML(it.p.name)}</td>
+        <td><a href="#" data-open="1">${escapeHTML(recordLabel(it.p,it.r,it.ridx))}</a></td>
+        <td>Kontakt ${it.kidx+1}</td>
+        <td>${escapeHTML(it.k.anlass||"")}</td>
+        <td>${escapeHTML(it.k.followUpThema||"")}</td>
+        <td>${escapeHTML(it.k.notiz||"")}</td>`;
+      tr.querySelector('a[data-open="1"]').onclick = (e)=>{
+        e.preventDefault();
+        ACTIVE_PARTNER_KEY = it.p.key;
+        document.body.setAttribute("data-partner", it.p.key);
+        const ps = getPartnerState(it.p.key);
+        ps.activeRecordId = it.r.id;
+        saveDB(DB);
+        showPage("main");
+        renderAll();
+      };
+      tb.appendChild(tr);
+    });
   }
 
   // ========= Search =========
   function normalize(s){ return (s||"").toString().toLowerCase().trim(); }
-
   function buildSearchText(p, r){
     const parts = [];
     parts.push(p.name, r.rolle, r.partnerNummer, r.makNummer, r.datum);
     parts.push(r.vorname, r.nachname, r.name, r.firma, r.email, r.mobil, r.telefon, r.strasse, r.plz, r.ort, r.land);
     parts.push(r.freiesFeld);
-    (r.kontakte || []).forEach(k => parts.push(k.datum, k.anlass, k.notiz, k.followUpDatum, k.followUpThema, k.followUpErledigt ? "erledigt" : "offen"));
+    (r.kontakte||[]).forEach(k=>parts.push(k.datum,k.anlass,k.notiz,k.followUpDatum,k.followUpThema,(k.followUpErledigt?"erledigt":"offen")));
     return normalize(parts.filter(Boolean).join(" | "));
   }
 
@@ -996,22 +1002,22 @@
     const q = normalize($("q").value);
     const tb = $("resultsTbody");
     tb.innerHTML = "";
-
     const hits = [];
-    PARTNERS.forEach(p => {
+
+    PARTNERS.forEach(p=>{
       const ps = getPartnerState(p.key);
-      ps.records.forEach((r, idx) => {
-        const txt = buildSearchText(p, r);
-        if (!q || txt.includes(q)) hits.push({ p, r, idx });
+      ps.records.forEach((r, idx)=>{
+        const txt = buildSearchText(p,r);
+        if (!q || txt.includes(q)) hits.push({p,r,idx});
       });
     });
 
-    hits.slice(0, 400).forEach(h => {
-      const tr = document.createElement("tr");
+    hits.slice(0,400).forEach(h=>{
+      const tr=document.createElement("tr");
       const nameShown = ((h.r.vorname||"").trim()+" "+(h.r.nachname||"").trim()).trim() || h.r.name || "";
       tr.innerHTML = `
         <td>${escapeHTML(h.p.name)}</td>
-        <td><a href="#" data-open="1">${escapeHTML(recordLabel(h.p, h.r, h.idx))}</a></td>
+        <td><a href="#" data-open="1">${escapeHTML(recordLabel(h.p,h.r,h.idx))}</a></td>
         <td>${escapeHTML(h.r.rolle||"")}</td>
         <td>${escapeHTML(h.p.hasMak ? (h.r.makNummer||"") : "")}</td>
         <td>${escapeHTML(h.r.partnerNummer||"")}</td>
@@ -1019,9 +1025,8 @@
         <td>${escapeHTML(h.r.firma||"")}</td>
         <td>${escapeHTML(h.r.email||"")}</td>
         <td>${escapeHTML([h.r.telefon,h.r.mobil].filter(Boolean).join(" / "))}</td>
-        <td>${escapeHTML(h.r.ort||"")}</td>
-      `;
-      tr.querySelector('a[data-open="1"]').onclick = (e) => {
+        <td>${escapeHTML(h.r.ort||"")}</td>`;
+      tr.querySelector('a[data-open="1"]').onclick = (e)=>{
         e.preventDefault();
         ACTIVE_PARTNER_KEY = h.p.key;
         document.body.setAttribute("data-partner", h.p.key);
@@ -1038,78 +1043,12 @@
     $("resultsCard").classList.remove("hidden");
   }
 
-  // ========= Global Followups =========
-  function parseDateISO(s){
-    if (!s) return null;
-    const t = Date.parse(s);
-    return Number.isFinite(t) ? t : null;
-  }
-
-  function renderFollowupsGlobal(){
-    const tb = $("followupsTbody");
-    tb.innerHTML = "";
-
-    const items = [];
-    PARTNERS.forEach(p => {
-      const ps = getPartnerState(p.key);
-      ps.records.forEach((r, ridx) => {
-        (r.kontakte || []).forEach((k, kidx) => {
-          if (k.followUpDatum && !k.followUpErledigt){
-            items.push({
-              due: k.followUpDatum,
-              dueT: parseDateISO(k.followUpDatum) || 9e15,
-              partner: p,
-              record: r,
-              ridx,
-              k,
-              kidx
-            });
-          }
-        });
-      });
-    });
-
-    items.sort((a,b) => a.dueT - b.dueT);
-
-    if (!items.length){
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="7" class="muted">Keine offenen Wiedervorlagen.</td>`;
-      tb.appendChild(tr);
-      return;
-    }
-
-    items.slice(0, 500).forEach(it => {
-      const nameShown = ((it.record.vorname||"").trim()+" "+(it.record.nachname||"").trim()).trim() || it.record.name || "";
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><b>${escapeHTML(it.due)}</b></td>
-        <td>${escapeHTML(it.partner.name)}</td>
-        <td><a href="#" data-open="1">${escapeHTML(recordLabel(it.partner, it.record, it.ridx))}</a></td>
-        <td>Kontakt ${it.kidx+1}${nameShown ? " · "+escapeHTML(nameShown) : ""}</td>
-        <td>${escapeHTML(it.k.anlass||"")}</td>
-        <td>${escapeHTML(it.k.followUpThema||"")}</td>
-        <td>${escapeHTML(it.k.notiz||"")}</td>
-      `;
-      tr.querySelector('a[data-open="1"]').onclick = (e) => {
-        e.preventDefault();
-        ACTIVE_PARTNER_KEY = it.partner.key;
-        document.body.setAttribute("data-partner", it.partner.key);
-        const ps = getPartnerState(it.partner.key);
-        ps.activeRecordId = it.record.id;
-        saveDB(DB);
-        showPage("main");
-        renderAll();
-      };
-      tb.appendChild(tr);
-    });
-  }
-
-  // ========= Helpers =========
+  // ========= Buttons / inputs =========
   async function copyToClipboard(text){
     try{ await navigator.clipboard.writeText(text || ""); }
     catch(e){
-      const ta = document.createElement("textarea");
-      ta.value = text || "";
+      const ta=document.createElement("textarea");
+      ta.value=text||"";
       document.body.appendChild(ta);
       ta.select();
       document.execCommand("copy");
@@ -1122,65 +1061,6 @@
     setTimeout(()=>setStatus("bereit",""), 2000);
   }
 
-  // ========= Bind main inputs =========
-  function bindMainInputs(){
-    $("rolle").oninput = () => { const r=getActiveRecord(); r.rolle=$("rolle").value; touch(r); renderRecordSelect(); };
-    $("partnerNummer").oninput = () => { const r=getActiveRecord(); r.partnerNummer=$("partnerNummer").value; touch(r); };
-    $("datum").onchange = () => { const r=getActiveRecord(); r.datum=$("datum").value; touch(r); renderRecordSelect(); renderFollowupsGlobal(); };
-    $("mak").oninput = () => { const r=getActiveRecord(); r.makNummer=$("mak").value; touch(r); renderRecordSelect(); };
-
-    $("vorname").oninput = () => { const r=getActiveRecord(); r.vorname=$("vorname").value; r.name=`${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim(); touch(r); renderRecordSelect(); };
-    $("nachname").oninput = () => { const r=getActiveRecord(); r.nachname=$("nachname").value; r.name=`${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim(); touch(r); renderRecordSelect(); };
-
-    $("firma").oninput = () => { const r=getActiveRecord(); r.firma=$("firma").value; touch(r); };
-    $("email").oninput = () => { const r=getActiveRecord(); r.email=$("email").value; touch(r); };
-    $("mobil").oninput = () => { const r=getActiveRecord(); r.mobil=$("mobil").value; touch(r); };
-    $("telefon").oninput = () => { const r=getActiveRecord(); r.telefon=$("telefon").value; touch(r); };
-    $("strasse").oninput = () => { const r=getActiveRecord(); r.strasse=$("strasse").value; touch(r); };
-    $("plz").oninput = () => { const r=getActiveRecord(); r.plz=$("plz").value; touch(r); };
-    $("ort").oninput = () => { const r=getActiveRecord(); r.ort=$("ort").value; touch(r); };
-    $("land").oninput = () => { const r=getActiveRecord(); r.land=$("land").value; touch(r); };
-
-    $("favorit").onchange = () => { const r=getActiveRecord(); r.favorit=!!$("favorit").checked; touch(r); renderRecordSelect(); };
-    $("optin").onchange = () => { const r=getActiveRecord(); r.optin=!!$("optin").checked; touch(r); };
-    $("online").onchange = () => { const r=getActiveRecord(); r.onlineAbschluss=!!$("online").checked; touch(r); };
-
-    $("freiesFeld").oninput = () => { const r=getActiveRecord(); r.freiesFeld=$("freiesFeld").value; touch(r); };
-
-    $("btnAddContact").onclick = () => {
-      const r=getActiveRecord();
-      r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
-      touch(r);
-      renderContacts();
-      renderFollowupsGlobal();
-    };
-
-    $("btnCopyAddress").onclick = async () => {
-      const r=getActiveRecord();
-      const txt = [r.firma, r.strasse, `${r.plz} ${r.ort}`.trim(), r.land].filter(Boolean).join("\n");
-      await copyToClipboard(txt);
-      toast("Adresse kopiert");
-    };
-    $("btnCopyPhone").onclick = async () => {
-      const r=getActiveRecord();
-      const txt = [r.telefon, r.mobil].filter(Boolean).join(" / ");
-      await copyToClipboard(txt);
-      toast("Tel/Mobil kopiert");
-    };
-    $("btnCall").onclick = () => {
-      const r=getActiveRecord();
-      const num = (r.telefon || r.mobil || "").replace(/\s+/g,"");
-      if (!num) return toast("Keine Nummer vorhanden", "warn");
-      window.location.href = "tel:"+num;
-    };
-    $("btnMail").onclick = () => {
-      const r=getActiveRecord();
-      if (!r.email) return toast("Keine E-Mail vorhanden", "warn");
-      window.location.href = "mailto:"+encodeURIComponent(r.email);
-    };
-  }
-
-  // ========= Records CRUD =========
   function addRecord(){
     const p = getActivePartner();
     const ps = getActivePartnerState();
@@ -1193,19 +1073,15 @@
 
   function deleteRecord(){
     const ps = getActivePartnerState();
-    if (ps.records.length <= 1){
-      alert("Mindestens ein Reiter muss bestehen bleiben.");
-      return;
-    }
+    if (ps.records.length<=1){ alert("Mindestens ein Reiter muss bleiben."); return; }
     const r = getActiveRecord();
     if (!confirm("Reiter wirklich löschen?")) return;
-    ps.records = ps.records.filter(x => x.id !== r.id);
+    ps.records = ps.records.filter(x=>x.id!==r.id);
     ps.activeRecordId = ps.records[0].id;
     saveDB(DB);
     renderAll();
   }
 
-  // ========= Custom fields =========
   function addCustomField(){
     const ps = getActivePartnerState();
     const label = prompt("Feldname (Label):");
@@ -1213,40 +1089,29 @@
     const type = prompt('Typ: "text" | "textarea" | "checkbox"', "text");
     const t = (type||"text").toLowerCase().trim();
     const allowed = ["text","textarea","checkbox"];
-    const finalType = allowed.includes(t) ? t : "text";
-    ps.customFields.push({ id: uid(), label: label.trim(), type: finalType });
+    ps.customFields.push({ id: uid(), label: label.trim(), type: allowed.includes(t)?t:"text" });
     saveDB(DB);
     renderAll();
   }
 
   function deleteCustomField(){
     const ps = getActivePartnerState();
-    if (!ps.customFields.length){
-      alert("Keine Zusatzfelder vorhanden.");
-      return;
-    }
+    if (!ps.customFields.length){ alert("Keine Zusatzfelder vorhanden."); return; }
     const names = ps.customFields.map((c,i)=>`${i+1}: ${c.label} (${c.type})`).join("\n");
     const pick = prompt("Welche Nummer löschen?\n"+names, "1");
     const n = parseInt(pick,10);
     if (!Number.isFinite(n) || n<1 || n>ps.customFields.length) return;
     const cf = ps.customFields[n-1];
-    if (!confirm(`Feld "${cf.label}" wirklich löschen? Werte in Datensätzen gehen verloren.`)) return;
-
-    ps.customFields = ps.customFields.filter(x => x.id !== cf.id);
-    ps.records.forEach(r => { if (r.custom && cf.id in r.custom) delete r.custom[cf.id]; });
+    if (!confirm(`Feld "${cf.label}" wirklich löschen?`)) return;
+    ps.customFields = ps.customFields.filter(x=>x.id!==cf.id);
+    ps.records.forEach(r=>{ if (r.custom && cf.id in r.custom) delete r.custom[cf.id]; });
     saveDB(DB);
     renderAll();
   }
 
-  // ========= CSV Export =========
-  function csvCell(v){
-    const s = (v===null||v===undefined) ? "" : String(v);
-    if (/[;"\n\r]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
-    return s;
-  }
-
+  // ========= Exports / Imports =========
   function downloadBlob(filename, blob){
-    const a = document.createElement("a");
+    const a=document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = filename;
     document.body.appendChild(a);
@@ -1255,83 +1120,47 @@
     URL.revokeObjectURL(a.href);
   }
 
-  function exportCSV(){
-    const rows = [];
-    const header = [
-      "partner","reiter","datum","rolle","partnerNummer","mak",
-      "favorit","vorname","nachname","firma","email","mobil","telefon",
-      "strasse","plz","ort","land","optin","onlineAbschluss",
-      "kontakte_count","naechste_wiedervorlage"
-    ];
-    rows.push(header);
-
-    PARTNERS.forEach(p=>{
-      const ps = getPartnerState(p.key);
-      ps.records.forEach((r, idx)=>{
-        const next = (r.kontakte||[])
-          .filter(k=>k.followUpDatum && !k.followUpErledigt)
-          .map(k=>k.followUpDatum)
-          .sort()[0] || "";
-        const line = [
-          p.name,
-          recordLabel(p,r,idx),
-          r.datum||"",
-          r.rolle||"",
-          r.partnerNummer||"",
-          p.hasMak ? (r.makNummer||"") : "",
-          r.favorit ? "Ja":"Nein",
-          r.vorname||"",
-          r.nachname||"",
-          r.firma||"",
-          r.email||"",
-          r.mobil||"",
-          r.telefon||"",
-          r.strasse||"",
-          r.plz||"",
-          r.ort||"",
-          r.land||"",
-          r.optin ? "Ja":"Nein",
-          r.onlineAbschluss ? "Ja":"Nein",
-          String((r.kontakte||[]).length),
-          next
-        ];
-        rows.push(line);
-      });
-    });
-
-    const csv = rows.map(r=>r.map(csvCell).join(";")).join("\n");
-    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
-    downloadBlob("vertriebspartner_export.csv", blob);
-  }
-
-  // ========= Exports (Delta / Full / SAFE Full) =========
   function exportFull(){
-    const blob = new Blob([JSON.stringify(DB, null, 2)], {type:"application/json"});
-    downloadBlob("vertriebspartner_backup_full.json", blob);
+    downloadBlob("vertriebspartner_backup_full.json", new Blob([JSON.stringify(DB, null, 2)], {type:"application/json"}));
   }
 
   function exportDelta(){
     const day = todayISO();
-    const delta = { app: APP_NAME, format: "VP_DELTA", version: DB.version, exportedAt: nowISO(), kind:"delta", partners:{} };
-
+    const delta = { app: APP_NAME, format: "VP_DELTA", version: DB.version, exportedAt: nowISO(), partners:{} };
     PARTNERS.forEach(p=>{
       const ps = getPartnerState(p.key);
       const recs = ps.records.filter(r => (r.updatedAt||"").slice(0,10) === day);
       if (recs.length){
-        delta.partners[p.key] = {
-          key: p.key,
-          customFields: ps.customFields,
-          records: recs,
-          activeRecordId: ps.activeRecordId
-        };
+        delta.partners[p.key] = { key:p.key, customFields: ps.customFields, records: recs, activeRecordId: ps.activeRecordId };
       }
     });
-
-    const blob = new Blob([JSON.stringify(delta, null, 2)], {type:"application/json"});
-    downloadBlob(`vertriebspartner_delta_${day}.json`, blob);
+    downloadBlob(`vertriebspartner_delta_${day}.json`, new Blob([JSON.stringify(delta, null, 2)], {type:"application/json"}));
   }
 
-  // simple hash (not crypto) to detect "wrong file" / corruption
+  function csvCell(v){
+    const s = (v===null||v===undefined) ? "" : String(v);
+    if (/[;"\n\r]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+    return s;
+  }
+
+  function exportCSV(){
+    const rows = [];
+    rows.push(["partner","reiter","datum","rolle","partnerNummer","mak","favorit","vorname","nachname","firma","email","mobil","telefon","strasse","plz","ort","land","optin","onlineAbschluss","kontakte_count"].join(";"));
+    PARTNERS.forEach(p=>{
+      const ps = getPartnerState(p.key);
+      ps.records.forEach((r, idx)=>{
+        rows.push([
+          p.name, recordLabel(p,r,idx), r.datum||"", r.rolle||"", r.partnerNummer||"", (p.hasMak?(r.makNummer||""):""),
+          (r.favorit?"Ja":"Nein"), r.vorname||"", r.nachname||"", r.firma||"", r.email||"",
+          r.mobil||"", r.telefon||"", r.strasse||"", r.plz||"", r.ort||"", r.land||"",
+          (r.optin?"Ja":"Nein"), (r.onlineAbschluss?"Ja":"Nein"), String((r.kontakte||[]).length)
+        ].map(csvCell).join(";"));
+      });
+    });
+    downloadBlob("vertriebspartner_export.csv", new Blob([rows.join("\n")], {type:"text/csv;charset=utf-8"}));
+  }
+
+  // quick hash (integrity check; not crypto)
   function quickHash(str){
     let h = 2166136261;
     for (let i=0;i<str.length;i++){
@@ -1342,41 +1171,25 @@
   }
 
   function exportSafeFull(){
-    const payload = DB;
-    const payloadStr = JSON.stringify(payload);
+    const payloadStr = JSON.stringify(DB);
     const safe = {
-      format: APP_FORMAT,
+      format: SAFE_FORMAT,
       app: APP_NAME,
-      build: APP_BUILD,
+      build: BUILD,
       createdAt: nowISO(),
       createdBy: sessionUserSafe(),
-      storageKey: STORAGE_KEY,
       payloadHash: quickHash(payloadStr),
-      payload
+      payload: DB
     };
-    const blob = new Blob([JSON.stringify(safe, null, 2)], {type:"application/json"});
-    downloadBlob(`SAFE_full_${todayISO()}.json`, blob);
-  }
-
-  // ========= IMPORT (FIXED) =========
-  async function readFiles(fileList){
-    const files = Array.from(fileList || []);
-    const arr = [];
-    for (const f of files){
-      const text = await f.text();
-      const json = safeJSONParse(text);
-      arr.push({ name:f.name, text, json });
-    }
-    return arr;
+    downloadBlob(`SAFE_full_${todayISO()}.json`, new Blob([JSON.stringify(safe, null, 2)], {type:"application/json"}));
   }
 
   function unwrapIfSafe(json){
-    if (json && json.format === APP_FORMAT && json.payload){
-      // verify hash
-      const str = JSON.stringify(json.payload);
-      const h = quickHash(str);
+    if (json && json.format === SAFE_FORMAT && json.payload){
+      const s = JSON.stringify(json.payload);
+      const h = quickHash(s);
       if (json.payloadHash && json.payloadHash !== h){
-        throw new Error("SAFE-Datei beschädigt oder verändert (Hash stimmt nicht).");
+        throw new Error("SAFE-Datei beschädigt/veraendert (Hash stimmt nicht).");
       }
       return json.payload;
     }
@@ -1384,7 +1197,6 @@
   }
 
   function mergeIncomingIntoDB(incoming){
-    // incoming can be full DB or delta with partners subset
     const incPartners = incoming.partners || {};
     PARTNERS.forEach(p=>{
       const inc = incPartners[p.key];
@@ -1392,13 +1204,9 @@
 
       const ps = getPartnerState(p.key);
 
-      // custom fields merge
       const byId = new Map(ps.customFields.map(c=>[c.id,c]));
-      (inc.customFields || []).forEach(c=>{
-        if (!byId.has(c.id)) { ps.customFields.push(c); byId.set(c.id,c); }
-      });
+      (inc.customFields || []).forEach(c=>{ if (!byId.has(c.id)) { ps.customFields.push(c); byId.set(c.id,c); } });
 
-      // records merge by id + updatedAt
       const localById = new Map(ps.records.map(r=>[r.id,r]));
       (inc.records || []).forEach(rIn=>{
         const rLocal = localById.get(rIn.id);
@@ -1424,52 +1232,49 @@
     saveDB(DB);
   }
 
+  async function readFiles(fileList){
+    const files = Array.from(fileList || []);
+    const arr = [];
+    for (const f of files){
+      const text = await f.text();
+      const json = safeJSONParse(text);
+      arr.push({ name:f.name, json });
+    }
+    return arr;
+  }
+
   async function importMerge(files){
     const arr = await readFiles(files);
-    for (const f of arr){
-      if (!f.json) { alert(`Ungültiges JSON: ${f.name}`); continue; }
-      let incoming;
-      try{
-        incoming = unwrapIfSafe(f.json);
-      }catch(e){
-        alert(`Import abgebrochen: ${f.name}\n${e.message}`);
-        continue;
-      }
+    let countOk = 0;
 
-      // detect types
-      if (incoming && incoming.format === "VP_DB" && incoming.partners){
-        // full DB
+    for (const f of arr){
+      if (!f.json){ alert(`Ungültiges JSON: ${f.name}`); continue; }
+      let incoming;
+      try{ incoming = unwrapIfSafe(f.json); }
+      catch(e){ alert(`Import abgebrochen: ${f.name}\n${e.message}`); continue; }
+
+      if (incoming && incoming.partners){
         mergeIncomingIntoDB(incoming);
-      } else if (incoming && incoming.format === "VP_DELTA" && incoming.partners){
-        // delta
-        mergeIncomingIntoDB(incoming);
-      } else if (incoming && incoming.partners){
-        // older full backup (v2)
-        mergeIncomingIntoDB(incoming);
+        countOk++;
       } else {
         alert(`Datei nicht erkannt: ${f.name}`);
       }
     }
-    toast("Import/Merge erledigt", "ok");
+
+    toast(`Import/Merge: ${countOk} Datei(en)`, countOk? "ok":"warn");
     renderAll();
   }
 
   async function importReplace(files){
-    if (!confirm("IMPORT (REPLACE): Dadurch wird deine lokale Datenbank komplett durch die Datei ersetzt. Fortfahren?")) return;
-
+    if (!confirm("IMPORT (REPLACE): lokale DB wird komplett ersetzt. Fortfahren?")) return;
     const arr = await readFiles(files);
     if (!arr.length) return;
 
-    // take first file only
     const f = arr[0];
     if (!f.json) return alert("Ungültiges JSON.");
-
     let incoming;
-    try{
-      incoming = unwrapIfSafe(f.json);
-    }catch(e){
-      return alert(`Import abgebrochen:\n${e.message}`);
-    }
+    try{ incoming = unwrapIfSafe(f.json); }
+    catch(e){ return alert(`Import abgebrochen:\n${e.message}`); }
 
     if (incoming && incoming.partners){
       replaceDB(incoming);
@@ -1480,7 +1285,66 @@
     }
   }
 
-  // ========= Bind global actions =========
+  // ========= Bind UI =========
+  function bindMainInputs(){
+    $("rolle").oninput = () => { const r=getActiveRecord(); r.rolle=$("rolle").value; touch(r); renderRecordSelect(); };
+    $("partnerNummer").oninput = () => { const r=getActiveRecord(); r.partnerNummer=$("partnerNummer").value; touch(r); };
+    $("datum").onchange = () => { const r=getActiveRecord(); r.datum=$("datum").value; touch(r); renderRecordSelect(); renderFollowupsGlobal(); };
+    $("mak").oninput = () => { const r=getActiveRecord(); r.makNummer=$("mak").value; touch(r); renderRecordSelect(); };
+
+    $("vorname").oninput = () => { const r=getActiveRecord(); r.vorname=$("vorname").value; r.name=`${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim(); touch(r); renderRecordSelect(); };
+    $("nachname").oninput = () => { const r=getActiveRecord(); r.nachname=$("nachname").value; r.name=`${(r.vorname||"").trim()} ${(r.nachname||"").trim()}`.trim(); touch(r); renderRecordSelect(); };
+
+    $("firma").oninput = () => { const r=getActiveRecord(); r.firma=$("firma").value; touch(r); };
+    $("email").oninput = () => { const r=getActiveRecord(); r.email=$("email").value; touch(r); };
+
+    $("mobil").oninput = () => { const r=getActiveRecord(); r.mobil=$("mobil").value; touch(r); };
+    $("telefon").oninput = () => { const r=getActiveRecord(); r.telefon=$("telefon").value; touch(r); };
+
+    $("strasse").oninput = () => { const r=getActiveRecord(); r.strasse=$("strasse").value; touch(r); };
+    $("plz").oninput = () => { const r=getActiveRecord(); r.plz=$("plz").value; touch(r); };
+    $("ort").oninput = () => { const r=getActiveRecord(); r.ort=$("ort").value; touch(r); };
+    $("land").oninput = () => { const r=getActiveRecord(); r.land=$("land").value; touch(r); };
+
+    $("favorit").onchange = () => { const r=getActiveRecord(); r.favorit=!!$("favorit").checked; touch(r); renderRecordSelect(); };
+    $("optin").onchange = () => { const r=getActiveRecord(); r.optin=!!$("optin").checked; touch(r); };
+    $("online").onchange = () => { const r=getActiveRecord(); r.onlineAbschluss=!!$("online").checked; touch(r); };
+
+    $("freiesFeld").oninput = () => { const r=getActiveRecord(); r.freiesFeld=$("freiesFeld").value; touch(r); };
+
+    $("btnAddContact").onclick = () => {
+      const r=getActiveRecord();
+      r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
+      touch(r);
+      renderContacts();
+      renderFollowupsGlobal();
+    };
+
+    $("btnCopyAddress").onclick = async () => {
+      const r=getActiveRecord();
+      const txt = [r.firma, r.strasse, `${r.plz} ${r.ort}`.trim(), r.land].filter(Boolean).join("\n");
+      await copyToClipboard(txt);
+      toast("Adresse kopiert","ok");
+    };
+    $("btnCopyPhone").onclick = async () => {
+      const r=getActiveRecord();
+      const txt = [r.telefon, r.mobil].filter(Boolean).join(" / ");
+      await copyToClipboard(txt);
+      toast("Tel/Mobil kopiert","ok");
+    };
+    $("btnCall").onclick = () => {
+      const r=getActiveRecord();
+      const num = (r.telefon || r.mobil || "").replace(/\s+/g,"");
+      if (!num) return toast("Keine Nummer vorhanden","warn");
+      window.location.href = "tel:"+num;
+    };
+    $("btnMail").onclick = () => {
+      const r=getActiveRecord();
+      if (!r.email) return toast("Keine E-Mail vorhanden","warn");
+      window.location.href = "mailto:"+encodeURIComponent(r.email);
+    };
+  }
+
   function bindAllInputs(){
     $("btnPrint").onclick = () => window.print();
     $("btnLogout").onclick = () => setSession(null);
@@ -1503,14 +1367,13 @@
     $("btnExportSafeFull").onclick = () => exportSafeFull();
     $("btnExportCSV").onclick = () => exportCSV();
 
-    $("btnImportMerge").onclick = () => { $("fileImport").dataset.mode = "merge"; $("fileImport").click(); };
-    $("btnImportReplace").onclick = () => { $("fileImport").dataset.mode = "replace"; $("fileImport").click(); };
+    $("btnImportMerge").onclick = () => { $("fileImport").dataset.mode="merge"; $("fileImport").click(); };
+    $("btnImportReplace").onclick = () => { $("fileImport").dataset.mode="replace"; $("fileImport").click(); };
 
     $("fileImport").onchange = async (e) => {
       const mode = $("fileImport").dataset.mode || "merge";
-      const files = e.target.files;
-      if (mode === "replace") await importReplace(files);
-      else await importMerge(files);
+      if (mode === "replace") await importReplace(e.target.files);
+      else await importMerge(e.target.files);
       e.target.value = "";
     };
 
@@ -1522,11 +1385,10 @@
     $("tabStats").onclick = () => showPage("stats");
   }
 
-  // ========= Pages =========
   function showPage(which){
     const main = $("mainCard");
     const stats = $("statsCard");
-    if (which === "stats"){
+    if (which==="stats"){
       $("tabMain").classList.remove("active");
       $("tabStats").classList.add("active");
       main.classList.add("hidden");
@@ -1540,11 +1402,16 @@
     }
   }
 
+  // ========= Render all =========
   function renderAll(){
-    DB = loadDB();
+    // Always load from localStorage (current key), but DO NOT overwrite DB after import
+    const raw = localStorage.getItem(STORAGE_KEY);
+    DB = ensureSchema(safeJSONParse(raw)) || ensureSchema(emptyDB());
+    saveDB(DB);
 
     const sess = getSession();
     const loggedIn = !!sess;
+
     $("who").textContent = loggedIn ? `${sess.user} (${sess.role})` : "nicht eingeloggt";
 
     $("loginCard").classList.toggle("hidden", loggedIn);
@@ -1555,9 +1422,12 @@
     $("tabMain").classList.add("active");
     $("tabStats").classList.remove("active");
 
-    if (!loggedIn){ setStatus("bereit", ""); return; }
+    if (!loggedIn){
+      setStatus("bereit","");
+      return;
+    }
 
-    setStatus("eingeloggt", "ok");
+    setStatus("eingeloggt","ok");
     document.body.setAttribute("data-partner", ACTIVE_PARTNER_KEY);
 
     renderPartnerTabs();
