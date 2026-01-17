@@ -152,6 +152,7 @@
       letter-spacing:.03em;
       text-transform:uppercase;
     }
+
     .iconRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
     .iconBtn{
       display:inline-flex; align-items:center; gap:8px;
@@ -165,12 +166,45 @@
     .iconBtn:hover{border-color:rgba(29,78,216,.35)}
     .iconBtn.primary{background:var(--pf-main); color:#fff; border-color:transparent}
 
+    .hidden{display:none !important}
+
     table{width:100%; border-collapse:separate; border-spacing:0}
     th, td{font-size:12px; padding:10px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
     th{color:var(--muted); font-weight:900; background:rgba(255,255,255,.65); position:sticky; top:0}
-    .tblWrap{max-height:360px; overflow:auto; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.7)}
+    .tblWrap{max-height:420px; overflow:auto; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.7)}
 
-    .hidden{display:none !important}
+    .kpiGrid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(240px, 1fr));
+      gap:10px;
+    }
+    @media (max-width: 1100px){ .kpiGrid{grid-template-columns:1fr} }
+
+    .kpi{
+      border:1px solid color-mix(in srgb, var(--pf-main) 22%, transparent);
+      background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.78));
+      border-radius:16px;
+      padding:12px;
+    }
+    .kpi b{display:block; font-size:12px; color:var(--muted); letter-spacing:.02em; text-transform:uppercase}
+    .kpi .big{font-size:18px; font-weight:900; margin-top:6px}
+    .kpi .sub{font-size:12px; color:var(--muted); margin-top:4px}
+
+    .partnerDot{
+      width:10px; height:10px; border-radius:999px; display:inline-block;
+      background:var(--pf-main);
+      border:1px solid rgba(0,0,0,.08);
+    }
+
+    /* Freies Feld: volle Breite + "handschriftlich" + blau */
+    #freiesFeld{
+      width:100%;
+      min-height:140px;
+      font-family: "Segoe Print","Comic Sans MS", cursive;
+      color:#2563eb;
+      font-size:16px;
+      line-height:1.35;
+    }
 
     @media (max-width: 1020px){ .wrap{grid-template-columns:1fr} }
     @media print{
@@ -194,6 +228,7 @@
     <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-left:8px;">
       <button class="tab active" id="tabMain">Hauptansicht</button>
       <button class="tab" id="tabStats">Auswertung</button>
+      <button class="tab" id="tabFollowups">Wiedervorlagen</button>
     </div>
 
     <div class="spacer"></div>
@@ -360,6 +395,80 @@
       </div>
     </div>
 
+    <!-- Produktion direkt nach Stammdaten -->
+    <div class="stammBox" style="margin-top:14px;">
+      <div class="stammTitle">
+        <div class="tag">Produktion je Reiter</div>
+        <div class="mini">Ziel (€) · Ist (€) — manuell überschreibbar</div>
+      </div>
+
+      <div class="row">
+        <div class="field w6">
+          <label>Voll – Ziel (€)</label>
+          <input id="pVollZiel" inputmode="decimal" placeholder="z. B. 12.500">
+        </div>
+        <div class="field w6">
+          <label>Voll – Ist (€)</label>
+          <input id="pVollIst" inputmode="decimal" placeholder="z. B. 3.200">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field w6">
+          <label>Beihilfe – Ziel (€)</label>
+          <input id="pBeihilfeZiel" inputmode="decimal">
+        </div>
+        <div class="field w6">
+          <label>Beihilfe – Ist (€)</label>
+          <input id="pBeihilfeIst" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field w6">
+          <label>Zusatz – Ziel (€)</label>
+          <input id="pZusatzZiel" inputmode="decimal">
+        </div>
+        <div class="field w6">
+          <label>Zusatz – Ist (€)</label>
+          <input id="pZusatzIst" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field w6">
+          <label>Pflege – Ziel (€)</label>
+          <input id="pPflegeZiel" inputmode="decimal">
+        </div>
+        <div class="field w6">
+          <label>Pflege – Ist (€)</label>
+          <input id="pPflegeIst" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field w6">
+          <label>bKV – Ziel (€)</label>
+          <input id="pBkvZiel" inputmode="decimal">
+        </div>
+        <div class="field w6">
+          <label>bKV – Ist (€)</label>
+          <input id="pBkvIst" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="field w6">
+          <label>Reise – Ziel (€)</label>
+          <input id="pReiseZiel" inputmode="decimal">
+        </div>
+        <div class="field w6">
+          <label>Reise – Ist (€)</label>
+          <input id="pReiseIst" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+
     <div class="divider"></div>
 
     <div class="h">Kontakt-Historie (inkl. Wiedervorlage)</div>
@@ -380,14 +489,59 @@
     <div id="customFieldsWrap" style="margin-top:12px;"></div>
   </main>
 
+  <!-- Auswertung: Gesamt über alle Datensätze -->
   <main class="card hidden" id="statsCard">
     <div class="h">Auswertung</div>
-    <div class="muted" style="margin-top:6px;">Globale Wiedervorlagen über alle Partner.</div>
+    <div class="muted" style="margin-top:6px;">Gesamtziele & Ist-Summen über <b>alle Partner</b> und <b>alle Reiter</b>.</div>
+
     <div class="divider"></div>
+
+    <div class="kpiGrid" id="kpiGrid"></div>
+
+    <div class="divider"></div>
+
+    <div class="h" style="display:flex; align-items:center; gap:10px;">
+      <span>Details (Summe je Partner)</span>
+      <span class="pill" id="sumHint">—</span>
+    </div>
+
     <div class="tblWrap" style="margin-top:12px;">
       <table>
         <thead>
-          <tr><th>Fällig</th><th>Partner</th><th>Reiter</th><th>Kontakt</th><th>Anlass</th><th>Thema</th><th>Notiz</th></tr>
+          <tr>
+            <th>Partner</th>
+            <th>Voll Ziel</th><th>Voll Ist</th>
+            <th>Beihilfe Ziel</th><th>Beihilfe Ist</th>
+            <th>Zusatz Ziel</th><th>Zusatz Ist</th>
+            <th>Pflege Ziel</th><th>Pflege Ist</th>
+            <th>bKV Ziel</th><th>bKV Ist</th>
+            <th>Reise Ziel</th><th>Reise Ist</th>
+            <th>Gesamt Ziel</th><th>Gesamt Ist</th>
+          </tr>
+        </thead>
+        <tbody id="statsPartnerTbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Wiedervorlagen: eigene Seite -->
+  <main class="card hidden" id="followupsCard">
+    <div class="h">Wiedervorlagen (Übersicht)</div>
+    <div class="muted" style="margin-top:6px;">Offene Wiedervorlagen über <b>alle Partner</b> (farbig je Partner).</div>
+    <div class="divider"></div>
+
+    <div class="tblWrap" style="margin-top:12px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Fällig</th>
+            <th>Partner</th>
+            <th>Reiter</th>
+            <th>Kontakt</th>
+            <th>Anlass</th>
+            <th>Thema</th>
+            <th>Notiz</th>
+          </tr>
         </thead>
         <tbody id="followupsTbody"></tbody>
       </table>
@@ -405,7 +559,10 @@
     <div class="tblWrap" style="margin-top:12px; max-height:420px;">
       <table>
         <thead>
-          <tr><th>Partner</th><th>Reiter</th><th>Rolle</th><th>MAK</th><th>Partnernr</th><th>Name</th><th>Firma</th><th>E-Mail</th><th>Tel/Mobil</th><th>Ort</th></tr>
+          <tr>
+            <th>Partner</th><th>Reiter</th><th>Rolle</th><th>MAK</th><th>Partnernr</th>
+            <th>Name</th><th>Firma</th><th>E-Mail</th><th>Tel/Mobil</th><th>Ort</th>
+          </tr>
         </thead>
         <tbody id="resultsTbody"></tbody>
       </table>
@@ -415,10 +572,9 @@
 
 <script>
 (() => {
-  // ========= App meta =========
   const APP_NAME = "Vertriebspartner Offline";
   const SAFE_FORMAT = "VP_SAFE_EXPORT_V1";
-  const BUILD = "2026-01-16-v4-migration-importsafe";
+  const BUILD = "2026-01-16-v5-production-followups";
 
   const PARTNERS = [
     { key:"fonds_finanz", name:"Fonds Finanz", hasMak:true },
@@ -428,13 +584,15 @@
     { key:"wir_finanz",  name:"WIR-Finanz",  hasMak:false },
   ];
 
-  // NEW storage keys (v4)
-  const STORAGE_KEY = "vp_offline_db_v4";
-  const SESSION_KEY = "vp_offline_session_v4";
-  const USERS_KEY   = "vp_offline_users_v4";
+  // NEW storage keys
+  const STORAGE_KEY = "vp_offline_db_v5";
+  const SESSION_KEY = "vp_offline_session_v5";
+  const USERS_KEY   = "vp_offline_users_v5";
 
   // OLD keys (auto-migration)
-  const OLD_STORAGE_KEYS = ["vp_offline_db_v3","vp_offline_db_v2","vp_offline_db_v1","vp_offline_db"];
+  const OLD_STORAGE_KEYS = [
+    "vp_offline_db_v4","vp_offline_db_v3","vp_offline_db_v2","vp_offline_db_v1","vp_offline_db"
+  ];
 
   const $ = (id) => document.getElementById(id);
 
@@ -447,6 +605,33 @@
     const p = $("statusPill");
     p.textContent = text;
     p.className = "pill " + (kind || "");
+  }
+
+  function escapeHTML(s){
+    return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // money parse (accept "12.500", "12,500", "12 500", "€ 12.500,00")
+  function moneyParse(v){
+    if (v===null || v===undefined) return 0;
+    let s = String(v).trim();
+    if (!s) return 0;
+    s = s.replace(/[€\s]/g,"");
+    // if both , and . exist -> assume . thousands and , decimal
+    if (s.includes(",") && s.includes(".")){
+      s = s.replace(/\./g,"").replace(",",".");
+    } else if (s.includes(",") && !s.includes(".")){
+      // assume comma is decimal
+      s = s.replace(",",".");
+    }
+    // remove thousands separators left
+    s = s.replace(/(?!^)-/g,"").replace(/[^0-9.\-]/g,"");
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : 0;
+  }
+  function moneyFmt(n){
+    const x = Number(n||0);
+    return x.toLocaleString("de-DE",{minimumFractionDigits:0, maximumFractionDigits:0});
   }
 
   // ========= Users / Session =========
@@ -567,6 +752,16 @@
       optin: false,
       onlineAbschluss: false,
 
+      // Produktion je Reiter: Ziel + Ist je Sparte
+      prod: {
+        voll:    { ziel:"", ist:"" },
+        beihilfe:{ ziel:"", ist:"" },
+        zusatz:  { ziel:"", ist:"" },
+        pflege:  { ziel:"", ist:"" },
+        bkv:     { ziel:"", ist:"" },
+        reise:   { ziel:"", ist:"" },
+      },
+
       kontakte: [
         { id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() }
       ],
@@ -585,7 +780,7 @@
     return {
       app: APP_NAME,
       format: "VP_DB",
-      version: 4,
+      version: 5,
       createdAt: nowISO(),
       updatedAt: nowISO(),
       partners
@@ -596,7 +791,7 @@
     if (!db || !db.partners) db = emptyDB();
     db.app ||= APP_NAME;
     db.format ||= "VP_DB";
-    db.version ||= 4;
+    db.version ||= 5;
 
     PARTNERS.forEach(p=>{
       if (!db.partners[p.key]) db.partners[p.key] = { key:p.key, customFields:[], records:[], activeRecordId:null };
@@ -638,6 +833,15 @@
         r.optin ??= false;
         r.onlineAbschluss ??= false;
 
+        // Production defaults + migrate old flat fields if any existed
+        if (!r.prod || typeof r.prod !== "object") r.prod = {};
+        const ensureBucket = (key) => {
+          r.prod[key] ||= {};
+          r.prod[key].ziel ??= "";
+          r.prod[key].ist ??= "";
+        };
+        ["voll","beihilfe","zusatz","pflege","bkv","reise"].forEach(ensureBucket);
+
         if (!Array.isArray(r.kontakte)) r.kontakte = [];
         if (r.kontakte.length === 0){
           r.kontakte.push({ id: uid(), datum: todayISO(), anlass:"", notiz:"", followUpDatum:"", followUpThema:"", followUpErledigt:false, createdAt: nowISO(), updatedAt: nowISO() });
@@ -668,7 +872,6 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
   }
 
-  // -------- migration: old key -> new key (only if new key empty)
   function migrateIfNeeded(){
     const hasNew = !!localStorage.getItem(STORAGE_KEY);
     if (hasNew) return;
@@ -686,7 +889,6 @@
 
   // ========= Global state =========
   migrateIfNeeded();
-
   let DB = ensureSchema(safeJSONParse(localStorage.getItem(STORAGE_KEY))) || ensureSchema(emptyDB());
   saveDB(DB);
 
@@ -748,7 +950,6 @@
     });
   }
 
-  // ========= Form render =========
   function setFieldValue(id, value){
     const el = $(id);
     if (!el) return;
@@ -780,6 +981,20 @@
     $("favorit").checked = !!r.favorit;
     $("optin").checked = !!r.optin;
     $("online").checked = !!r.onlineAbschluss;
+
+    // Produktion
+    setFieldValue("pVollZiel", r.prod.voll.ziel);
+    setFieldValue("pVollIst", r.prod.voll.ist);
+    setFieldValue("pBeihilfeZiel", r.prod.beihilfe.ziel);
+    setFieldValue("pBeihilfeIst", r.prod.beihilfe.ist);
+    setFieldValue("pZusatzZiel", r.prod.zusatz.ziel);
+    setFieldValue("pZusatzIst", r.prod.zusatz.ist);
+    setFieldValue("pPflegeZiel", r.prod.pflege.ziel);
+    setFieldValue("pPflegeIst", r.prod.pflege.ist);
+    setFieldValue("pBkvZiel", r.prod.bkv.ziel);
+    setFieldValue("pBkvIst", r.prod.bkv.ist);
+    setFieldValue("pReiseZiel", r.prod.reise.ziel);
+    setFieldValue("pReiseIst", r.prod.reise.ist);
 
     $("freiesFeld").value = r.freiesFeld || "";
 
@@ -873,10 +1088,6 @@
     });
   }
 
-  function escapeHTML(s){
-    return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
   function renderCustomFields(){
     const ps = getActivePartnerState();
     const r = getActiveRecord();
@@ -931,7 +1142,7 @@
     wrap.appendChild(row);
   }
 
-  // ========= Followups global =========
+  // ========= Followups global (for page) =========
   function parseDateISO(s){
     if (!s) return null;
     const t = Date.parse(s);
@@ -965,9 +1176,13 @@
 
     items.slice(0,500).forEach(it=>{
       const tr=document.createElement("tr");
+      // colored partner cell via inline badge
       tr.innerHTML = `
         <td><b>${escapeHTML(it.k.followUpDatum)}</b></td>
-        <td>${escapeHTML(it.p.name)}</td>
+        <td>
+          <span class="partnerDot" style="background:${partnerColor(it.p.key)}"></span>
+          <span style="margin-left:8px; font-weight:900;">${escapeHTML(it.p.name)}</span>
+        </td>
         <td><a href="#" data-open="1">${escapeHTML(recordLabel(it.p,it.r,it.ridx))}</a></td>
         <td>Kontakt ${it.kidx+1}</td>
         <td>${escapeHTML(it.k.anlass||"")}</td>
@@ -983,6 +1198,108 @@
         showPage("main");
         renderAll();
       };
+      tb.appendChild(tr);
+    });
+  }
+
+  function partnerColor(key){
+    // match CSS palette
+    if (key==="fonds_finanz") return "#2563eb";
+    if (key==="demv") return "#059669";
+    if (key==="taures") return "#7c3aed";
+    if (key==="tvd") return "#ea580c";
+    if (key==="wir_finanz") return "#0f766e";
+    return "#1d4ed8";
+  }
+
+  // ========= Auswertung =========
+  function sumAll(){
+    const totals = {
+      voll:{ziel:0, ist:0},
+      beihilfe:{ziel:0, ist:0},
+      zusatz:{ziel:0, ist:0},
+      pflege:{ziel:0, ist:0},
+      bkv:{ziel:0, ist:0},
+      reise:{ziel:0, ist:0},
+    };
+
+    const byPartner = {};
+    PARTNERS.forEach(p=>{
+      byPartner[p.key] = {
+        p,
+        voll:{ziel:0, ist:0},
+        beihilfe:{ziel:0, ist:0},
+        zusatz:{ziel:0, ist:0},
+        pflege:{ziel:0, ist:0},
+        bkv:{ziel:0, ist:0},
+        reise:{ziel:0, ist:0},
+      };
+
+      const ps = getPartnerState(p.key);
+      ps.records.forEach(r=>{
+        const add = (k) => {
+          const z = moneyParse(r.prod?.[k]?.ziel);
+          const i = moneyParse(r.prod?.[k]?.ist);
+          totals[k].ziel += z; totals[k].ist += i;
+          byPartner[p.key][k].ziel += z; byPartner[p.key][k].ist += i;
+        };
+        ["voll","beihilfe","zusatz","pflege","bkv","reise"].forEach(add);
+      });
+    });
+
+    return { totals, byPartner };
+  }
+
+  function renderStats(){
+    const { totals, byPartner } = sumAll();
+
+    const totalZiel =
+      totals.voll.ziel + totals.beihilfe.ziel + totals.zusatz.ziel + totals.pflege.ziel + totals.bkv.ziel + totals.reise.ziel;
+    const totalIst =
+      totals.voll.ist + totals.beihilfe.ist + totals.zusatz.ist + totals.pflege.ist + totals.bkv.ist + totals.reise.ist;
+
+    $("sumHint").textContent = `Gesamt: Ziel ${moneyFmt(totalZiel)} € · Ist ${moneyFmt(totalIst)} €`;
+    $("sumHint").className = "pill ok";
+
+    const kpi = (title, ziel, ist) => {
+      const el = document.createElement("div");
+      el.className = "kpi";
+      el.innerHTML = `<b>${escapeHTML(title)}</b>
+        <div class="big">Ziel ${moneyFmt(ziel)} €</div>
+        <div class="sub">Ist ${moneyFmt(ist)} €</div>`;
+      return el;
+    };
+
+    const g = $("kpiGrid");
+    g.innerHTML = "";
+    g.appendChild(kpi("Gesamt (alle Sparten)", totalZiel, totalIst));
+    g.appendChild(kpi("Voll", totals.voll.ziel, totals.voll.ist));
+    g.appendChild(kpi("Beihilfe", totals.beihilfe.ziel, totals.beihilfe.ist));
+    g.appendChild(kpi("Zusatz", totals.zusatz.ziel, totals.zusatz.ist));
+    g.appendChild(kpi("Pflege", totals.pflege.ziel, totals.pflege.ist));
+    g.appendChild(kpi("bKV", totals.bkv.ziel, totals.bkv.ist));
+    g.appendChild(kpi("Reise", totals.reise.ziel, totals.reise.ist));
+
+    const tb = $("statsPartnerTbody");
+    tb.innerHTML = "";
+
+    PARTNERS.forEach(p=>{
+      const s = byPartner[p.key];
+      const zSum = s.voll.ziel+s.beihilfe.ziel+s.zusatz.ziel+s.pflege.ziel+s.bkv.ziel+s.reise.ziel;
+      const iSum = s.voll.ist+s.beihilfe.ist+s.zusatz.ist+s.pflege.ist+s.bkv.ist+s.reise.ist;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><span class="partnerDot" style="background:${partnerColor(p.key)}"></span>
+            <span style="margin-left:8px;font-weight:900;">${escapeHTML(p.name)}</span></td>
+        <td>${moneyFmt(s.voll.ziel)}</td><td>${moneyFmt(s.voll.ist)}</td>
+        <td>${moneyFmt(s.beihilfe.ziel)}</td><td>${moneyFmt(s.beihilfe.ist)}</td>
+        <td>${moneyFmt(s.zusatz.ziel)}</td><td>${moneyFmt(s.zusatz.ist)}</td>
+        <td>${moneyFmt(s.pflege.ziel)}</td><td>${moneyFmt(s.pflege.ist)}</td>
+        <td>${moneyFmt(s.bkv.ziel)}</td><td>${moneyFmt(s.bkv.ist)}</td>
+        <td>${moneyFmt(s.reise.ziel)}</td><td>${moneyFmt(s.reise.ist)}</td>
+        <td><b>${moneyFmt(zSum)}</b></td><td><b>${moneyFmt(iSum)}</b></td>
+      `;
       tb.appendChild(tr);
     });
   }
@@ -1043,7 +1360,7 @@
     $("resultsCard").classList.remove("hidden");
   }
 
-  // ========= Buttons / inputs =========
+  // ========= Helpers =========
   async function copyToClipboard(text){
     try{ await navigator.clipboard.writeText(text || ""); }
     catch(e){
@@ -1145,22 +1462,38 @@
 
   function exportCSV(){
     const rows = [];
-    rows.push(["partner","reiter","datum","rolle","partnerNummer","mak","favorit","vorname","nachname","firma","email","mobil","telefon","strasse","plz","ort","land","optin","onlineAbschluss","kontakte_count"].join(";"));
+    rows.push([
+      "partner","reiter","datum","rolle","partnerNummer","mak","favorit",
+      "vorname","nachname","firma","email","mobil","telefon","strasse","plz","ort","land",
+      "optin","onlineAbschluss",
+      "voll_ziel","voll_ist","beihilfe_ziel","beihilfe_ist","zusatz_ziel","zusatz_ist",
+      "pflege_ziel","pflege_ist","bkv_ziel","bkv_ist","reise_ziel","reise_ist",
+      "kontakte_count"
+    ].join(";"));
+
     PARTNERS.forEach(p=>{
       const ps = getPartnerState(p.key);
       ps.records.forEach((r, idx)=>{
         rows.push([
           p.name, recordLabel(p,r,idx), r.datum||"", r.rolle||"", r.partnerNummer||"", (p.hasMak?(r.makNummer||""):""),
-          (r.favorit?"Ja":"Nein"), r.vorname||"", r.nachname||"", r.firma||"", r.email||"",
+          (r.favorit?"Ja":"Nein"),
+          r.vorname||"", r.nachname||"", r.firma||"", r.email||"",
           r.mobil||"", r.telefon||"", r.strasse||"", r.plz||"", r.ort||"", r.land||"",
-          (r.optin?"Ja":"Nein"), (r.onlineAbschluss?"Ja":"Nein"), String((r.kontakte||[]).length)
+          (r.optin?"Ja":"Nein"), (r.onlineAbschluss?"Ja":"Nein"),
+          r.prod?.voll?.ziel||"", r.prod?.voll?.ist||"",
+          r.prod?.beihilfe?.ziel||"", r.prod?.beihilfe?.ist||"",
+          r.prod?.zusatz?.ziel||"", r.prod?.zusatz?.ist||"",
+          r.prod?.pflege?.ziel||"", r.prod?.pflege?.ist||"",
+          r.prod?.bkv?.ziel||"", r.prod?.bkv?.ist||"",
+          r.prod?.reise?.ziel||"", r.prod?.reise?.ist||"",
+          String((r.kontakte||[]).length)
         ].map(csvCell).join(";"));
       });
     });
+
     downloadBlob("vertriebspartner_export.csv", new Blob([rows.join("\n")], {type:"text/csv;charset=utf-8"}));
   }
 
-  // quick hash (integrity check; not crypto)
   function quickHash(str){
     let h = 2166136261;
     for (let i=0;i<str.length;i++){
@@ -1189,7 +1522,7 @@
       const s = JSON.stringify(json.payload);
       const h = quickHash(s);
       if (json.payloadHash && json.payloadHash !== h){
-        throw new Error("SAFE-Datei beschädigt/veraendert (Hash stimmt nicht).");
+        throw new Error("SAFE-Datei beschädigt/verändert (Hash stimmt nicht).");
       }
       return json.payload;
     }
@@ -1310,6 +1643,17 @@
     $("optin").onchange = () => { const r=getActiveRecord(); r.optin=!!$("optin").checked; touch(r); };
     $("online").onchange = () => { const r=getActiveRecord(); r.onlineAbschluss=!!$("online").checked; touch(r); };
 
+    // Produktion
+    const bindProd = (id, bucket, key) => {
+      $(id).oninput = () => { const r=getActiveRecord(); r.prod[bucket][key] = $(id).value; touch(r); if (!isHidden("statsCard")) renderStats(); };
+    };
+    bindProd("pVollZiel","voll","ziel"); bindProd("pVollIst","voll","ist");
+    bindProd("pBeihilfeZiel","beihilfe","ziel"); bindProd("pBeihilfeIst","beihilfe","ist");
+    bindProd("pZusatzZiel","zusatz","ziel"); bindProd("pZusatzIst","zusatz","ist");
+    bindProd("pPflegeZiel","pflege","ziel"); bindProd("pPflegeIst","pflege","ist");
+    bindProd("pBkvZiel","bkv","ziel"); bindProd("pBkvIst","bkv","ist");
+    bindProd("pReiseZiel","reise","ziel"); bindProd("pReiseIst","reise","ist");
+
     $("freiesFeld").oninput = () => { const r=getActiveRecord(); r.freiesFeld=$("freiesFeld").value; touch(r); };
 
     $("btnAddContact").onclick = () => {
@@ -1344,6 +1688,8 @@
       window.location.href = "mailto:"+encodeURIComponent(r.email);
     };
   }
+
+  function isHidden(id){ return $(id).classList.contains("hidden"); }
 
   function bindAllInputs(){
     $("btnPrint").onclick = () => window.print();
@@ -1383,28 +1729,37 @@
 
     $("tabMain").onclick = () => showPage("main");
     $("tabStats").onclick = () => showPage("stats");
+    $("tabFollowups").onclick = () => showPage("followups");
   }
 
   function showPage(which){
     const main = $("mainCard");
     const stats = $("statsCard");
+    const follow = $("followupsCard");
+
+    $("tabMain").classList.remove("active");
+    $("tabStats").classList.remove("active");
+    $("tabFollowups").classList.remove("active");
+    main.classList.add("hidden");
+    stats.classList.add("hidden");
+    follow.classList.add("hidden");
+
     if (which==="stats"){
-      $("tabMain").classList.remove("active");
       $("tabStats").classList.add("active");
-      main.classList.add("hidden");
       stats.classList.remove("hidden");
+      renderStats();
+    } else if (which==="followups"){
+      $("tabFollowups").classList.add("active");
+      follow.classList.remove("hidden");
       renderFollowupsGlobal();
     } else {
-      $("tabStats").classList.remove("active");
       $("tabMain").classList.add("active");
-      stats.classList.add("hidden");
       main.classList.remove("hidden");
     }
   }
 
   // ========= Render all =========
   function renderAll(){
-    // Always load from localStorage (current key), but DO NOT overwrite DB after import
     const raw = localStorage.getItem(STORAGE_KEY);
     DB = ensureSchema(safeJSONParse(raw)) || ensureSchema(emptyDB());
     saveDB(DB);
@@ -1416,13 +1771,11 @@
 
     $("loginCard").classList.toggle("hidden", loggedIn);
     $("navCard").classList.toggle("hidden", !loggedIn);
-    $("mainCard").classList.toggle("hidden", !loggedIn);
-
-    $("statsCard").classList.add("hidden");
-    $("tabMain").classList.add("active");
-    $("tabStats").classList.remove("active");
 
     if (!loggedIn){
+      $("mainCard").classList.add("hidden");
+      $("statsCard").classList.add("hidden");
+      $("followupsCard").classList.add("hidden");
       setStatus("bereit","");
       return;
     }
@@ -1433,7 +1786,11 @@
     renderPartnerTabs();
     renderRecordSelect();
     renderForm();
-    renderFollowupsGlobal();
+
+    // keep current page selection (default: main)
+    if ($("tabStats").classList.contains("active")) showPage("stats");
+    else if ($("tabFollowups").classList.contains("active")) showPage("followups");
+    else showPage("main");
   }
 
   // ========= Init =========
