@@ -171,6 +171,7 @@
     table{width:100%; border-collapse:separate; border-spacing:0}
     th, td{font-size:12px; padding:10px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
     th{color:var(--muted); font-weight:900; background:rgba(255,255,255,.65); position:sticky; top:0}
+    tbody tr:hover{background:rgba(29,78,216,.04)}
     .tblWrap{max-height:420px; overflow:auto; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.7)}
 
     .kpiGrid{
@@ -205,6 +206,51 @@
       font-size:16px;
       line-height:1.35;
     }
+
+    /* NEW: Partner-Ziele + Followup-Filter */
+    .goalWrap{display:flex; flex-direction:column; gap:10px}
+    .goalRow{
+      display:grid;
+      grid-template-columns: 220px 1fr 1fr 160px;
+      gap:10px; align-items:center;
+      padding:12px;
+      border:1px solid color-mix(in srgb, var(--pf-main) 18%, var(--line));
+      border-radius:16px;
+      background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.78));
+    }
+    .goalRow .title{display:flex; align-items:center; gap:10px; font-weight:900}
+    .goalRow .pct{font-weight:900; text-align:right}
+    .progressBar{height:10px; background:rgba(11,27,51,.10); border-radius:999px; overflow:hidden}
+    .progressBar > span{display:block; height:100%; width:0%; background:var(--pf-main)}
+    .goalInputs{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+    .goalInputs .field{min-width:auto}
+    .goalRow input{padding:10px 12px; border-radius:12px}
+    .goalTotal{
+      border:1px solid color-mix(in srgb, var(--pf-main) 28%, transparent);
+      background:linear-gradient(180deg, var(--pf-soft2), rgba(255,255,255,.92));
+    }
+    @media (max-width: 980px){
+      .goalRow{grid-template-columns:1fr}
+      .goalRow .pct{text-align:left}
+      .goalInputs{grid-template-columns:1fr}
+    }
+
+    .filterBar{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      padding:10px; border-radius:16px;
+      border:1px solid color-mix(in srgb, var(--pf-main) 16%, var(--line));
+      background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.70));
+    }
+    .chipGroup{display:flex; gap:8px; flex-wrap:wrap}
+    .chip{
+      padding:8px 12px; border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.86);
+      font-weight:900; font-size:12px;
+      cursor:pointer;
+    }
+    .chip.active{background:var(--pf-soft); border-color:transparent; color:var(--pf-main)}
+    #fuQ{min-width:240px}
 
     @media (max-width: 1020px){ .wrap{grid-template-columns:1fr} }
     @media print{
@@ -496,6 +542,15 @@
 
     <div class="divider"></div>
 
+    <!-- NEW: Hauptpartner-Ziele (manuell) -->
+    <div class="h">Hauptpartner – Gesamtziel (manuell)</div>
+    <div class="muted" style="margin-top:6px;">
+      Ziel &amp; Erreicht werden hier <b>manuell</b> gepflegt (separat von den Reiter-Produktionen).
+    </div>
+    <div style="margin-top:12px;" id="partnerGoalsWrap"></div>
+
+    <div class="divider"></div>
+
     <div class="kpiGrid" id="kpiGrid"></div>
 
     <div class="divider"></div>
@@ -529,6 +584,15 @@
     <div class="h">Wiedervorlagen (Übersicht)</div>
     <div class="muted" style="margin-top:6px;">Offene Wiedervorlagen über <b>alle Partner</b> (farbig je Partner).</div>
     <div class="divider"></div>
+
+    <!-- NEW: Filterleiste -->
+    <div class="filterBar">
+      <div class="chipGroup" id="fuTimeChips"></div>
+      <select id="fuPartner" title="Partner-Filter"></select>
+      <input id="fuQ" placeholder="Suche (Anlass / Thema / Notiz) …">
+      <button class="ghost" id="fuReset">Reset</button>
+      <span class="pill" id="fuCount">—</span>
+    </div>
 
     <div class="tblWrap" style="margin-top:12px;">
       <table>
@@ -574,7 +638,7 @@
 (() => {
   const APP_NAME = "Vertriebspartner Offline";
   const SAFE_FORMAT = "VP_SAFE_EXPORT_V1";
-  const BUILD = "2026-01-16-v5-production-followups";
+  const BUILD = "2026-01-19-v6-partner-goals-followup-filters";
 
   const PARTNERS = [
     { key:"fonds_finanz", name:"Fonds Finanz", hasMak:true },
@@ -771,6 +835,12 @@
     };
   }
 
+  function defaultPartnerGoals(){
+    const g = {};
+    PARTNERS.forEach(p => g[p.key] = { ziel:"", erreicht:"" });
+    return g;
+  }
+
   function emptyDB(){
     const partners = {};
     PARTNERS.forEach(p => {
@@ -780,9 +850,10 @@
     return {
       app: APP_NAME,
       format: "VP_DB",
-      version: 5,
+      version: 6,
       createdAt: nowISO(),
       updatedAt: nowISO(),
+      partnerGoals: defaultPartnerGoals(), // NEW
       partners
     };
   }
@@ -791,7 +862,15 @@
     if (!db || !db.partners) db = emptyDB();
     db.app ||= APP_NAME;
     db.format ||= "VP_DB";
-    db.version ||= 5;
+    db.version = Math.max(Number(db.version||0), 6);
+
+    // NEW: partner goals
+    db.partnerGoals ||= {};
+    PARTNERS.forEach(p=>{
+      db.partnerGoals[p.key] ||= {};
+      db.partnerGoals[p.key].ziel ??= "";
+      db.partnerGoals[p.key].erreicht ??= "";
+    });
 
     PARTNERS.forEach(p=>{
       if (!db.partners[p.key]) db.partners[p.key] = { key:p.key, customFields:[], records:[], activeRecordId:null };
@@ -893,6 +972,9 @@
   saveDB(DB);
 
   let ACTIVE_PARTNER_KEY = PARTNERS[0].key;
+
+  // Followup filters (NEW)
+  let FOLLOW_FILTERS = { timeframe:"all", partner:"all", q:"" };
 
   function getPartnerState(key){ return DB.partners[key]; }
   function getActivePartner(){ return PARTNERS.find(p=>p.key===ACTIVE_PARTNER_KEY) || PARTNERS[0]; }
@@ -1142,15 +1224,112 @@
     wrap.appendChild(row);
   }
 
-  // ========= Followups global (for page) =========
-  function parseDateISO(s){
-    if (!s) return null;
-    const t = Date.parse(s);
-    return Number.isFinite(t) ? t : null;
+  // ========= Followups global + Filters =========
+  const DAY_MS = 24*60*60*1000;
+
+  function parseISODateLocal(s){
+    const m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(String(s||"").trim());
+    if (!m) return null;
+    const y = parseInt(m[1],10), mo = parseInt(m[2],10), d = parseInt(m[3],10);
+    const dt = new Date(y, mo-1, d);
+    dt.setHours(0,0,0,0);
+    return dt.getTime();
+  }
+
+  function todayStartMs(){
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    return d.getTime();
+  }
+
+  function startOfWeekMs(baseMs){
+    const d = new Date(baseMs);
+    const day = (d.getDay()+6)%7; // Monday=0
+    d.setDate(d.getDate() - day);
+    d.setHours(0,0,0,0);
+    return d.getTime();
+  }
+
+  function initFollowupFiltersUI(){
+    const chipWrap = $("fuTimeChips");
+    const sel = $("fuPartner");
+
+    if (!chipWrap || !sel) return;
+
+    const chips = [
+      { key:"all", label:"Alle" },
+      { key:"today", label:"Heute" },
+      { key:"week", label:"Diese Woche" },
+      { key:"overdue", label:"Überfällig" },
+    ];
+
+    chipWrap.innerHTML = "";
+    chips.forEach(c=>{
+      const b = document.createElement("button");
+      b.className = "chip" + (FOLLOW_FILTERS.timeframe===c.key ? " active" : "");
+      b.textContent = c.label;
+      b.dataset.key = c.key;
+      b.onclick = () => {
+        FOLLOW_FILTERS.timeframe = c.key;
+        applyFollowupFilterUI();
+        renderFollowupsGlobal();
+      };
+      chipWrap.appendChild(b);
+    });
+
+    sel.innerHTML = "";
+    const optAll = document.createElement("option");
+    optAll.value = "all";
+    optAll.textContent = "Alle Partner";
+    sel.appendChild(optAll);
+
+    PARTNERS.forEach(p=>{
+      const o = document.createElement("option");
+      o.value = p.key;
+      o.textContent = p.name;
+      sel.appendChild(o);
+    });
+
+    sel.value = FOLLOW_FILTERS.partner;
+    sel.onchange = () => {
+      FOLLOW_FILTERS.partner = sel.value;
+      renderFollowupsGlobal();
+    };
+
+    const q = $("fuQ");
+    if (q){
+      q.value = FOLLOW_FILTERS.q || "";
+      q.oninput = () => {
+        FOLLOW_FILTERS.q = (q.value||"").toLowerCase().trim();
+        renderFollowupsGlobal();
+      };
+    }
+
+    const reset = $("fuReset");
+    if (reset){
+      reset.onclick = () => {
+        FOLLOW_FILTERS = { timeframe:"all", partner:"all", q:"" };
+        if ($("fuQ")) $("fuQ").value = "";
+        if ($("fuPartner")) $("fuPartner").value = "all";
+        applyFollowupFilterUI();
+        renderFollowupsGlobal();
+      };
+    }
+
+    applyFollowupFilterUI();
+  }
+
+  function applyFollowupFilterUI(){
+    const chipWrap = $("fuTimeChips");
+    if (!chipWrap) return;
+    Array.from(chipWrap.querySelectorAll("button.chip")).forEach(btn=>{
+      btn.classList.toggle("active", btn.dataset.key === FOLLOW_FILTERS.timeframe);
+    });
   }
 
   function renderFollowupsGlobal(){
     const tb = $("followupsTbody");
+    if (!tb) return;
     tb.innerHTML = "";
     const items = [];
 
@@ -1159,7 +1338,8 @@
       ps.records.forEach((r, ridx)=>{
         (r.kontakte||[]).forEach((k, kidx)=>{
           if (k.followUpDatum && !k.followUpErledigt){
-            items.push({ p, r, ridx, k, kidx, dueT: parseDateISO(k.followUpDatum) || 9e15 });
+            const dueT = parseISODateLocal(k.followUpDatum) ?? 9e15;
+            items.push({ p, r, ridx, k, kidx, dueT });
           }
         });
       });
@@ -1167,16 +1347,53 @@
 
     items.sort((a,b)=>a.dueT-b.dueT);
 
-    if (!items.length){
+    // apply filters (NEW)
+    const t0 = todayStartMs();
+    const w0 = startOfWeekMs(t0);
+    const w1 = w0 + 7*DAY_MS;
+
+    let filtered = items;
+
+    if (FOLLOW_FILTERS.partner !== "all"){
+      filtered = filtered.filter(it => it.p.key === FOLLOW_FILTERS.partner);
+    }
+
+    if (FOLLOW_FILTERS.timeframe === "today"){
+      filtered = filtered.filter(it => it.dueT >= t0 && it.dueT < t0 + DAY_MS);
+    } else if (FOLLOW_FILTERS.timeframe === "week"){
+      filtered = filtered.filter(it => it.dueT >= w0 && it.dueT < w1);
+    } else if (FOLLOW_FILTERS.timeframe === "overdue"){
+      filtered = filtered.filter(it => it.dueT < t0);
+    }
+
+    if (FOLLOW_FILTERS.q){
+      const q = FOLLOW_FILTERS.q;
+      filtered = filtered.filter(it => {
+        const s = normalize([
+          it.p.name, recordLabel(it.p,it.r,it.ridx),
+          `Kontakt ${it.kidx+1}`,
+          it.k.anlass||"", it.k.followUpThema||"", it.k.notiz||""
+        ].join(" | "));
+        return s.includes(q);
+      });
+    }
+
+    const cnt = $("fuCount");
+    if (cnt){
+      const label = filtered.length === 1 ? "1 offen" : `${filtered.length} offen`;
+      cnt.textContent = label;
+      cnt.className = "pill " + (filtered.length ? "ok" : "warn");
+    }
+
+    if (!filtered.length){
       const tr=document.createElement("tr");
-      tr.innerHTML = `<td colspan="7" class="muted">Keine offenen Wiedervorlagen.</td>`;
+      tr.innerHTML = `<td colspan="7" class="muted">Keine offenen Wiedervorlagen (für diesen Filter).</td>`;
       tb.appendChild(tr);
       return;
     }
 
-    items.slice(0,500).forEach(it=>{
+    filtered.slice(0,500).forEach(it=>{
       const tr=document.createElement("tr");
-      // colored partner cell via inline badge
       tr.innerHTML = `
         <td><b>${escapeHTML(it.k.followUpDatum)}</b></td>
         <td>
@@ -1210,6 +1427,136 @@
     if (key==="tvd") return "#ea580c";
     if (key==="wir_finanz") return "#0f766e";
     return "#1d4ed8";
+  }
+
+  // ========= Partner Goals (NEW) =========
+  function goalKind(pct){
+    if (pct >= 1) return "ok";
+    if (pct >= 0.7) return "warn";
+    return "bad";
+  }
+
+  function renderPartnerGoals(){
+    const wrap = $("partnerGoalsWrap");
+    if (!wrap) return;
+
+    wrap.innerHTML = "";
+
+    const outer = document.createElement("div");
+    outer.className = "goalWrap";
+
+    // Total row
+    const totalRow = document.createElement("div");
+    totalRow.className = "goalRow goalTotal";
+    totalRow.innerHTML = `
+      <div class="title"><span class="partnerDot"></span> <span>Gesamt Hauptpartner</span></div>
+      <div class="goalInputs">
+        <div class="field"><label>Ziel (€)</label><input data-goal="total" data-f="ziel" inputmode="decimal" placeholder="z. B. 100.000"></div>
+        <div class="field"><label>Erreicht (€)</label><input data-goal="total" data-f="erreicht" inputmode="decimal" placeholder="z. B. 55.000"></div>
+      </div>
+      <div>
+        <div class="progressBar" style="margin-top:6px;"><span data-bar="total"></span></div>
+        <div class="muted" style="margin-top:6px;" data-sub="total"></div>
+      </div>
+      <div class="pct"><span class="pill" data-pill="total">—</span></div>
+    `;
+    outer.appendChild(totalRow);
+
+    // Partner rows
+    PARTNERS.forEach(p=>{
+      const row = document.createElement("div");
+      row.className = "goalRow";
+      row.innerHTML = `
+        <div class="title">
+          <span class="partnerDot" style="background:${partnerColor(p.key)}"></span>
+          <span>${escapeHTML(p.name)}</span>
+        </div>
+        <div class="goalInputs">
+          <div class="field"><label>Ziel (€)</label><input data-goal="${p.key}" data-f="ziel" inputmode="decimal" placeholder="Ziel"></div>
+          <div class="field"><label>Erreicht (€)</label><input data-goal="${p.key}" data-f="erreicht" inputmode="decimal" placeholder="Erreicht"></div>
+        </div>
+        <div>
+          <div class="progressBar" style="margin-top:6px;"><span data-bar="${p.key}"></span></div>
+          <div class="muted" style="margin-top:6px;" data-sub="${p.key}"></div>
+        </div>
+        <div class="pct"><span class="pill" data-pill="${p.key}">—</span></div>
+      `;
+      outer.appendChild(row);
+    });
+
+    wrap.appendChild(outer);
+
+    // set values + bind
+    wrap.querySelectorAll("input[data-goal]").forEach(inp=>{
+      const key = inp.getAttribute("data-goal");
+      const f = inp.getAttribute("data-f");
+      if (key === "total"){
+        // computed (read-only)
+        inp.disabled = true;
+        inp.title = "Wird automatisch aus den Partner-Zielen berechnet";
+      } else {
+        inp.value = DB.partnerGoals?.[key]?.[f] ?? "";
+        inp.oninput = () => {
+          DB.partnerGoals[key][f] = inp.value;
+          saveDB(DB);
+          updatePartnerGoalsComputed();
+        };
+      }
+    });
+
+    updatePartnerGoalsComputed();
+  }
+
+  function updatePartnerGoalsComputed(){
+    const wrap = $("partnerGoalsWrap");
+    if (!wrap) return;
+
+    let totalZ = 0;
+    let totalE = 0;
+
+    PARTNERS.forEach(p=>{
+      const g = DB.partnerGoals?.[p.key] || { ziel:"", erreicht:"" };
+      const z = moneyParse(g.ziel);
+      const e = moneyParse(g.erreicht);
+      totalZ += z;
+      totalE += e;
+
+      const pct = z > 0 ? (e / z) : 0;
+      const width = Math.max(0, Math.min(100, pct * 100));
+
+      const bar = wrap.querySelector(`[data-bar="${p.key}"]`);
+      if (bar) bar.style.width = width.toFixed(1) + "%";
+
+      const sub = wrap.querySelector(`[data-sub="${p.key}"]`);
+      if (sub) sub.textContent = `Ziel ${moneyFmt(z)} € · Erreicht ${moneyFmt(e)} €`;
+
+      const pill = wrap.querySelector(`[data-pill="${p.key}"]`);
+      if (pill){
+        pill.textContent = z > 0 ? `${Math.round(width)}%` : "—";
+        pill.className = "pill " + (z>0 ? goalKind(pct) : "");
+      }
+    });
+
+    // Total (computed)
+    const pctT = totalZ > 0 ? (totalE / totalZ) : 0;
+    const widthT = Math.max(0, Math.min(100, pctT * 100));
+
+    const inpZ = wrap.querySelector(`input[data-goal="total"][data-f="ziel"]`);
+    const inpE = wrap.querySelector(`input[data-goal="total"][data-f="erreicht"]`);
+    if (inpZ) inpZ.value = moneyFmt(totalZ);
+    if (inpE) inpE.value = moneyFmt(totalE);
+
+    const barT = wrap.querySelector(`[data-bar="total"]`);
+    if (barT) barT.style.width = widthT.toFixed(1) + "%";
+
+    const subT = wrap.querySelector(`[data-sub="total"]`);
+    if (subT) subT.textContent = `Ziel ${moneyFmt(totalZ)} € · Erreicht ${moneyFmt(totalE)} €`;
+
+    const pillT = wrap.querySelector(`[data-pill="total"]`);
+    if (pillT){
+      pillT.textContent = totalZ > 0 ? `${Math.round(widthT)}%` : "—";
+      pillT.className = "pill " + (totalZ>0 ? goalKind(pctT) : "");
+    }
   }
 
   // ========= Auswertung =========
@@ -1251,6 +1598,8 @@
   }
 
   function renderStats(){
+    renderPartnerGoals(); // NEW
+
     const { totals, byPartner } = sumAll();
 
     const totalZiel =
@@ -1443,7 +1792,7 @@
 
   function exportDelta(){
     const day = todayISO();
-    const delta = { app: APP_NAME, format: "VP_DELTA", version: DB.version, exportedAt: nowISO(), partners:{} };
+    const delta = { app: APP_NAME, format: "VP_DELTA", version: DB.version, exportedAt: nowISO(), partners:{}, partnerGoals: DB.partnerGoals };
     PARTNERS.forEach(p=>{
       const ps = getPartnerState(p.key);
       const recs = ps.records.filter(r => (r.updatedAt||"").slice(0,10) === day);
@@ -1531,6 +1880,18 @@
 
   function mergeIncomingIntoDB(incoming){
     const incPartners = incoming.partners || {};
+    // NEW: partnerGoals merge (simple overwrite if present)
+    if (incoming.partnerGoals && typeof incoming.partnerGoals === "object"){
+      DB.partnerGoals ||= {};
+      PARTNERS.forEach(p=>{
+        const ig = incoming.partnerGoals[p.key];
+        if (!ig) return;
+        DB.partnerGoals[p.key] ||= { ziel:"", erreicht:"" };
+        if ("ziel" in ig) DB.partnerGoals[p.key].ziel = ig.ziel;
+        if ("erreicht" in ig) DB.partnerGoals[p.key].erreicht = ig.erreicht;
+      });
+    }
+
     PARTNERS.forEach(p=>{
       const inc = incPartners[p.key];
       if (!inc) return;
@@ -1751,6 +2112,7 @@
     } else if (which==="followups"){
       $("tabFollowups").classList.add("active");
       follow.classList.remove("hidden");
+      initFollowupFiltersUI(); // NEW
       renderFollowupsGlobal();
     } else {
       $("tabMain").classList.add("active");
@@ -1797,6 +2159,7 @@
   initLoginUI();
   bindAllInputs();
   bindMainInputs();
+  initFollowupFiltersUI(); // NEW (safe to call early)
   renderAll();
 })();
 </script>
