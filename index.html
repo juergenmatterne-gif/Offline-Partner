@@ -197,7 +197,6 @@
       border:1px solid rgba(0,0,0,.08);
     }
 
-    /* Freies Feld: volle Breite + "handschriftlich" + blau */
     #freiesFeld{
       width:100%;
       min-height:140px;
@@ -207,7 +206,6 @@
       line-height:1.35;
     }
 
-    /* NEW: Partner-Ziele + Followup-Filter */
     .goalWrap{display:flex; flex-direction:column; gap:10px}
     .goalRow{
       display:grid;
@@ -441,7 +439,6 @@
       </div>
     </div>
 
-    <!-- Produktion direkt nach Stammdaten -->
     <div class="stammBox" style="margin-top:14px;">
       <div class="stammTitle">
         <div class="tag">Produktion je Reiter</div>
@@ -535,17 +532,16 @@
     <div id="customFieldsWrap" style="margin-top:12px;"></div>
   </main>
 
-  <!-- Auswertung: Gesamt über alle Datensätze -->
   <main class="card hidden" id="statsCard">
     <div class="h">Auswertung</div>
     <div class="muted" style="margin-top:6px;">Gesamtziele & Ist-Summen über <b>alle Partner</b> und <b>alle Reiter</b>.</div>
 
     <div class="divider"></div>
 
-    <!-- NEW: Hauptpartner-Ziele (manuell) -->
     <div class="h">Hauptpartner – Gesamtziel (manuell)</div>
     <div class="muted" style="margin-top:6px;">
-      Ziel &amp; Erreicht werden hier <b>manuell</b> gepflegt (separat von den Reiter-Produktionen).
+      Ziel &amp; Erreicht werden hier <b>manuell</b> gepflegt (separat von den Reiter-Produktionen).<br>
+      <b>Gesamt Hauptpartner</b> rechnet nur: <b>Fonds Finanz + DEMV + WIR-Finanz</b> (Taures/TVD sind Unterpartner und werden nicht zugerechnet).
     </div>
     <div style="margin-top:12px;" id="partnerGoalsWrap"></div>
 
@@ -579,13 +575,11 @@
     </div>
   </main>
 
-  <!-- Wiedervorlagen: eigene Seite -->
   <main class="card hidden" id="followupsCard">
     <div class="h">Wiedervorlagen (Übersicht)</div>
     <div class="muted" style="margin-top:6px;">Offene Wiedervorlagen über <b>alle Partner</b> (farbig je Partner).</div>
     <div class="divider"></div>
 
-    <!-- NEW: Filterleiste -->
     <div class="filterBar">
       <div class="chipGroup" id="fuTimeChips"></div>
       <select id="fuPartner" title="Partner-Filter"></select>
@@ -626,6 +620,7 @@
           <tr>
             <th>Partner</th><th>Reiter</th><th>Rolle</th><th>MAK</th><th>Partnernr</th>
             <th>Name</th><th>Firma</th><th>E-Mail</th><th>Tel/Mobil</th><th>Ort</th>
+            <th>Gesamt Ziel</th><th>Gesamt Ist</th>
           </tr>
         </thead>
         <tbody id="resultsTbody"></tbody>
@@ -638,7 +633,7 @@
 (() => {
   const APP_NAME = "Vertriebspartner Offline";
   const SAFE_FORMAT = "VP_SAFE_EXPORT_V1";
-  const BUILD = "2026-01-19-v6-partner-goals-followup-filters";
+  const BUILD = "2026-02-11-v7-mainpartner-goals-search-totals-prefill";
 
   const PARTNERS = [
     { key:"fonds_finanz", name:"Fonds Finanz", hasMak:true },
@@ -648,12 +643,13 @@
     { key:"wir_finanz",  name:"WIR-Finanz",  hasMak:false },
   ];
 
-  // NEW storage keys
+  // NEW: Nur diese Hauptpartner zählen in "Gesamt Hauptpartner – Gesamtziel (manuell)"
+  const MAIN_PARTNER_KEYS = ["fonds_finanz","demv","wir_finanz"];
+
   const STORAGE_KEY = "vp_offline_db_v5";
   const SESSION_KEY = "vp_offline_session_v5";
   const USERS_KEY   = "vp_offline_users_v5";
 
-  // OLD keys (auto-migration)
   const OLD_STORAGE_KEYS = [
     "vp_offline_db_v4","vp_offline_db_v3","vp_offline_db_v2","vp_offline_db_v1","vp_offline_db"
   ];
@@ -675,20 +671,16 @@
     return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  // money parse (accept "12.500", "12,500", "12 500", "€ 12.500,00")
   function moneyParse(v){
     if (v===null || v===undefined) return 0;
     let s = String(v).trim();
     if (!s) return 0;
     s = s.replace(/[€\s]/g,"");
-    // if both , and . exist -> assume . thousands and , decimal
     if (s.includes(",") && s.includes(".")){
       s = s.replace(/\./g,"").replace(",",".");
     } else if (s.includes(",") && !s.includes(".")){
-      // assume comma is decimal
       s = s.replace(",",".");
     }
-    // remove thousands separators left
     s = s.replace(/(?!^)-/g,"").replace(/[^0-9.\-]/g,"");
     const n = parseFloat(s);
     return Number.isFinite(n) ? n : 0;
@@ -696,6 +688,17 @@
   function moneyFmt(n){
     const x = Number(n||0);
     return x.toLocaleString("de-DE",{minimumFractionDigits:0, maximumFractionDigits:0});
+  }
+
+  // NEW: Gesamt Ziel/Ist je Datensatz (Summe über alle Sparten)
+  function recordProdTotals(r){
+    const keys = ["voll","beihilfe","zusatz","pflege","bkv","reise"];
+    let ziel = 0, ist = 0;
+    keys.forEach(k=>{
+      ziel += moneyParse(r.prod?.[k]?.ziel);
+      ist  += moneyParse(r.prod?.[k]?.ist);
+    });
+    return { ziel, ist };
   }
 
   // ========= Users / Session =========
@@ -816,7 +819,6 @@
       optin: false,
       onlineAbschluss: false,
 
-      // Produktion je Reiter: Ziel + Ist je Sparte
       prod: {
         voll:    { ziel:"", ist:"" },
         beihilfe:{ ziel:"", ist:"" },
@@ -853,7 +855,7 @@
       version: 6,
       createdAt: nowISO(),
       updatedAt: nowISO(),
-      partnerGoals: defaultPartnerGoals(), // NEW
+      partnerGoals: defaultPartnerGoals(),
       partners
     };
   }
@@ -864,7 +866,6 @@
     db.format ||= "VP_DB";
     db.version = Math.max(Number(db.version||0), 6);
 
-    // NEW: partner goals
     db.partnerGoals ||= {};
     PARTNERS.forEach(p=>{
       db.partnerGoals[p.key] ||= {};
@@ -912,7 +913,6 @@
         r.optin ??= false;
         r.onlineAbschluss ??= false;
 
-        // Production defaults + migrate old flat fields if any existed
         if (!r.prod || typeof r.prod !== "object") r.prod = {};
         const ensureBucket = (key) => {
           r.prod[key] ||= {};
@@ -966,14 +966,11 @@
     }
   }
 
-  // ========= Global state =========
   migrateIfNeeded();
   let DB = ensureSchema(safeJSONParse(localStorage.getItem(STORAGE_KEY))) || ensureSchema(emptyDB());
   saveDB(DB);
 
   let ACTIVE_PARTNER_KEY = PARTNERS[0].key;
-
-  // Followup filters (NEW)
   let FOLLOW_FILTERS = { timeframe:"all", partner:"all", q:"" };
 
   function getPartnerState(key){ return DB.partners[key]; }
@@ -992,7 +989,6 @@
     $("autosavePill").className = "pill ok";
   }
 
-  // ========= Labels / tabs =========
   function recordLabel(p, r, idx){
     const role = ((r.rolle || "").trim()) || "ohne Rolle";
     const fn = ((r.vorname||"").trim() + " " + (r.nachname||"").trim()).trim();
@@ -1064,7 +1060,6 @@
     $("optin").checked = !!r.optin;
     $("online").checked = !!r.onlineAbschluss;
 
-    // Produktion
     setFieldValue("pVollZiel", r.prod.voll.ziel);
     setFieldValue("pVollIst", r.prod.voll.ist);
     setFieldValue("pBeihilfeZiel", r.prod.beihilfe.ziel);
@@ -1224,7 +1219,6 @@
     wrap.appendChild(row);
   }
 
-  // ========= Followups global + Filters =========
   const DAY_MS = 24*60*60*1000;
 
   function parseISODateLocal(s){
@@ -1244,7 +1238,7 @@
 
   function startOfWeekMs(baseMs){
     const d = new Date(baseMs);
-    const day = (d.getDay()+6)%7; // Monday=0
+    const day = (d.getDay()+6)%7;
     d.setDate(d.getDate() - day);
     d.setHours(0,0,0,0);
     return d.getTime();
@@ -1253,7 +1247,6 @@
   function initFollowupFiltersUI(){
     const chipWrap = $("fuTimeChips");
     const sel = $("fuPartner");
-
     if (!chipWrap || !sel) return;
 
     const chips = [
@@ -1347,7 +1340,6 @@
 
     items.sort((a,b)=>a.dueT-b.dueT);
 
-    // apply filters (NEW)
     const t0 = todayStartMs();
     const w0 = startOfWeekMs(t0);
     const w1 = w0 + 7*DAY_MS;
@@ -1420,7 +1412,6 @@
   }
 
   function partnerColor(key){
-    // match CSS palette
     if (key==="fonds_finanz") return "#2563eb";
     if (key==="demv") return "#059669";
     if (key==="taures") return "#7c3aed";
@@ -1429,7 +1420,6 @@
     return "#1d4ed8";
   }
 
-  // ========= Partner Goals (NEW) =========
   function goalKind(pct){
     if (pct >= 1) return "ok";
     if (pct >= 0.7) return "warn";
@@ -1445,11 +1435,10 @@
     const outer = document.createElement("div");
     outer.className = "goalWrap";
 
-    // Total row
     const totalRow = document.createElement("div");
     totalRow.className = "goalRow goalTotal";
     totalRow.innerHTML = `
-      <div class="title"><span class="partnerDot"></span> <span>Gesamt Hauptpartner</span></div>
+      <div class="title"><span class="partnerDot"></span> <span>Gesamt Hauptpartner (FF + DEMV + WIR-Finanz)</span></div>
       <div class="goalInputs">
         <div class="field"><label>Ziel (€)</label><input data-goal="total" data-f="ziel" inputmode="decimal" placeholder="z. B. 100.000"></div>
         <div class="field"><label>Erreicht (€)</label><input data-goal="total" data-f="erreicht" inputmode="decimal" placeholder="z. B. 55.000"></div>
@@ -1462,7 +1451,6 @@
     `;
     outer.appendChild(totalRow);
 
-    // Partner rows
     PARTNERS.forEach(p=>{
       const row = document.createElement("div");
       row.className = "goalRow";
@@ -1486,14 +1474,12 @@
 
     wrap.appendChild(outer);
 
-    // set values + bind
     wrap.querySelectorAll("input[data-goal]").forEach(inp=>{
       const key = inp.getAttribute("data-goal");
       const f = inp.getAttribute("data-f");
       if (key === "total"){
-        // computed (read-only)
         inp.disabled = true;
-        inp.title = "Wird automatisch aus den Partner-Zielen berechnet";
+        inp.title = "Wird automatisch aus den Hauptpartnern (FF/DEMV/WIR) berechnet";
       } else {
         inp.value = DB.partnerGoals?.[key]?.[f] ?? "";
         inp.oninput = () => {
@@ -1511,15 +1497,11 @@
     const wrap = $("partnerGoalsWrap");
     if (!wrap) return;
 
-    let totalZ = 0;
-    let totalE = 0;
-
+    // Partner-Zeilen (alle) weiterhin einzeln berechnen/rendern
     PARTNERS.forEach(p=>{
       const g = DB.partnerGoals?.[p.key] || { ziel:"", erreicht:"" };
       const z = moneyParse(g.ziel);
       const e = moneyParse(g.erreicht);
-      totalZ += z;
-      totalE += e;
 
       const pct = z > 0 ? (e / z) : 0;
       const width = Math.max(0, Math.min(100, pct * 100));
@@ -1537,7 +1519,15 @@
       }
     });
 
-    // Total (computed)
+    // TOTAL: nur Hauptpartner summieren
+    let totalZ = 0;
+    let totalE = 0;
+    MAIN_PARTNER_KEYS.forEach(k=>{
+      const g = DB.partnerGoals?.[k] || { ziel:"", erreicht:"" };
+      totalZ += moneyParse(g.ziel);
+      totalE += moneyParse(g.erreicht);
+    });
+
     const pctT = totalZ > 0 ? (totalE / totalZ) : 0;
     const widthT = Math.max(0, Math.min(100, pctT * 100));
 
@@ -1559,7 +1549,6 @@
     }
   }
 
-  // ========= Auswertung =========
   function sumAll(){
     const totals = {
       voll:{ziel:0, ist:0},
@@ -1598,7 +1587,7 @@
   }
 
   function renderStats(){
-    renderPartnerGoals(); // NEW
+    renderPartnerGoals();
 
     const { totals, byPartner } = sumAll();
 
@@ -1653,7 +1642,6 @@
     });
   }
 
-  // ========= Search =========
   function normalize(s){ return (s||"").toString().toLowerCase().trim(); }
   function buildSearchText(p, r){
     const parts = [];
@@ -1681,6 +1669,7 @@
     hits.slice(0,400).forEach(h=>{
       const tr=document.createElement("tr");
       const nameShown = ((h.r.vorname||"").trim()+" "+(h.r.nachname||"").trim()).trim() || h.r.name || "";
+      const tot = recordProdTotals(h.r);
       tr.innerHTML = `
         <td>${escapeHTML(h.p.name)}</td>
         <td><a href="#" data-open="1">${escapeHTML(recordLabel(h.p,h.r,h.idx))}</a></td>
@@ -1691,7 +1680,9 @@
         <td>${escapeHTML(h.r.firma||"")}</td>
         <td>${escapeHTML(h.r.email||"")}</td>
         <td>${escapeHTML([h.r.telefon,h.r.mobil].filter(Boolean).join(" / "))}</td>
-        <td>${escapeHTML(h.r.ort||"")}</td>`;
+        <td>${escapeHTML(h.r.ort||"")}</td>
+        <td><b>${moneyFmt(tot.ziel)}</b></td>
+        <td><b>${moneyFmt(tot.ist)}</b></td>`;
       tr.querySelector('a[data-open="1"]').onclick = (e)=>{
         e.preventDefault();
         ACTIVE_PARTNER_KEY = h.p.key;
@@ -1709,7 +1700,6 @@
     $("resultsCard").classList.remove("hidden");
   }
 
-  // ========= Helpers =========
   async function copyToClipboard(text){
     try{ await navigator.clipboard.writeText(text || ""); }
     catch(e){
@@ -1727,10 +1717,24 @@
     setTimeout(()=>setStatus("bereit",""), 2000);
   }
 
+  // NEW: Neuer Reiter übernimmt (vorbefüllt) Adresse/Zahl aus aktuellem Datensatz – bleibt editierbar
   function addRecord(){
     const p = getActivePartner();
     const ps = getActivePartnerState();
+    const src = getActiveRecord();
+
     const r = baseRecord(p);
+
+    // Vorbefüllung (Adresse/Zahl)
+    if (src){
+      r.firma = src.firma || r.firma;
+      r.strasse = src.strasse || r.strasse;
+      r.plz = src.plz || r.plz;
+      r.ort = src.ort || r.ort;
+      r.land = src.land || r.land;
+      r.partnerNummer = src.partnerNummer || r.partnerNummer;
+    }
+
     ps.records.push(r);
     ps.activeRecordId = r.id;
     saveDB(DB);
@@ -1775,7 +1779,6 @@
     renderAll();
   }
 
-  // ========= Exports / Imports =========
   function downloadBlob(filename, blob){
     const a=document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -1880,7 +1883,6 @@
 
   function mergeIncomingIntoDB(incoming){
     const incPartners = incoming.partners || {};
-    // NEW: partnerGoals merge (simple overwrite if present)
     if (incoming.partnerGoals && typeof incoming.partnerGoals === "object"){
       DB.partnerGoals ||= {};
       PARTNERS.forEach(p=>{
@@ -1979,7 +1981,6 @@
     }
   }
 
-  // ========= Bind UI =========
   function bindMainInputs(){
     $("rolle").oninput = () => { const r=getActiveRecord(); r.rolle=$("rolle").value; touch(r); renderRecordSelect(); };
     $("partnerNummer").oninput = () => { const r=getActiveRecord(); r.partnerNummer=$("partnerNummer").value; touch(r); };
@@ -2004,7 +2005,6 @@
     $("optin").onchange = () => { const r=getActiveRecord(); r.optin=!!$("optin").checked; touch(r); };
     $("online").onchange = () => { const r=getActiveRecord(); r.onlineAbschluss=!!$("online").checked; touch(r); };
 
-    // Produktion
     const bindProd = (id, bucket, key) => {
       $(id).oninput = () => { const r=getActiveRecord(); r.prod[bucket][key] = $(id).value; touch(r); if (!isHidden("statsCard")) renderStats(); };
     };
@@ -2112,7 +2112,7 @@
     } else if (which==="followups"){
       $("tabFollowups").classList.add("active");
       follow.classList.remove("hidden");
-      initFollowupFiltersUI(); // NEW
+      initFollowupFiltersUI();
       renderFollowupsGlobal();
     } else {
       $("tabMain").classList.add("active");
@@ -2120,7 +2120,6 @@
     }
   }
 
-  // ========= Render all =========
   function renderAll(){
     const raw = localStorage.getItem(STORAGE_KEY);
     DB = ensureSchema(safeJSONParse(raw)) || ensureSchema(emptyDB());
@@ -2149,17 +2148,15 @@
     renderRecordSelect();
     renderForm();
 
-    // keep current page selection (default: main)
     if ($("tabStats").classList.contains("active")) showPage("stats");
     else if ($("tabFollowups").classList.contains("active")) showPage("followups");
     else showPage("main");
   }
 
-  // ========= Init =========
   initLoginUI();
   bindAllInputs();
   bindMainInputs();
-  initFollowupFiltersUI(); // NEW (safe to call early)
+  initFollowupFiltersUI();
   renderAll();
 })();
 </script>
